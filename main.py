@@ -1,10 +1,20 @@
 import discord
-from discord.ext import commands
 
-bot = commands.Bot(command_prefix = "!", description = "Bot de Suicidaul")
+intents = discord.Intents.default()
+intents.message_content = True
 
-@bot.event
+client = discord.Client(intents=intents)
+
+@client.event
 async def on_ready():
-    print("Ready !")
+    print(f'We have logged in as {client.user}')
 
-bot.run("MTA1MTIwMjUxMDI5MzA1NzY0Nw.GviMZU.SRCECZQ8H5ezfW7LVOMszIpM4gQ48GPlka8H0w")
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+
+    if message.content.startswith('$hello'):
+        await message.channel.send('Hello!')
+
+client.run("MTA1MTIwMjUxMDI5MzA1NzY0Nw.GviMZU.SRCECZQ8H5ezfW7LVOMszIpM4gQ48GPlka8H0w")
