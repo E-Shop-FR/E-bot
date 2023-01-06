@@ -1,6 +1,17 @@
 import discord
-from discord import app_commands
+from discord import app_commands, utils
 from discord.app_commands import commands
+
+
+class tiket_launcher(discord.ui.View):
+    def __init__(self) -> None:
+        super().__init(timeout = None)
+
+    @discord.ui.button(label="Crée un tiket", custom_id="ticket_button", style=discord.ButtonStyle.blurple)
+
+    async def ticket(self, interaction: discord.Interaction, button:discord.ui.Button):
+        ticket = utils.get(interaction.guild.text_channels, name = f"ticket-for-{interaction.user.name}-{interaction.user.discrimanatior}")
+        if ticket is not None: await interaction.response.send_message(f"You already have aticket open at {ticket.mention=}!", ephemeral = True )
 
 
 class AClient(discord.Client):
