@@ -3,14 +3,14 @@ from discord import app_commands, utils
 from discord.app_commands import commands
 
 
-class tiket_launcher(discord.ui.View):
+class ticket_launcher(discord.ui.View):
     def __init__(self) -> None:
-        super().__init(timeout = None)
+        super().__init__(timeout = None)
 
     @discord.ui.button(label="Create a Ticket", custom_id="ticket_button", style=discord.ButtonStyle.blurple)
 
     async def ticket(self, interaction: discord.Interaction, button:discord.ui.Button):
-        ticket = utils.get(interaction.guild.text_channels, name = f"ticket-for-{interaction.user.name}-{interaction.user.discrimanatior}")
+        ticket = utils.get(interaction.guild.text_channels, name = f"ticket-for-{interaction.user.name}-{interaction.user.discriminator}")
         if ticket is not None: await interaction.response.send_message(f"You already have aticket open at {ticket.mention=}!", ephemeral = True )
         else:
             overwrites = {
@@ -28,14 +28,18 @@ class AClient(discord.Client):
     def __init__(self):
         super().__init__(intents=discord.Intents.default())
         self.synced = False
+        self.added = False
 
     async def on_ready(self):
         await self.wait_until_ready()
         if not self.synced:
             await tree.sync(guild=discord.Object(id=1046437841447686226))
             self.synced = True
+        if not self.added:
+            self.add_view(ticket_launcher())
+            self.added = True
         print(f"We have logged in as {self.user}.")
-
+            
     async def on_message(self, message):
         if message.author == self.user:
             return
@@ -71,9 +75,9 @@ async def self(ctx, amount: int = None):  # Set default value as None
             await ctx.channel.purge(limit=amount)
 
 
-@tree.command(name="ticket",guild = discord.object(id = 1046437841447686226), description = "Launches the ticketing system")
+@tree.command(name="ticket",guild=discord.Object(id=1046437841447686226), description = "Launches the ticketing system")
 async def ticketing(interaction: discord.Interaction):
-    embed = discord.Embed("If you need support, click the button below and create a ticket ! ", color = discord.Colour.blue())
+    embed = discord.Embed(title = "If you need support, click the button below and create a ticket ! ", color = discord.Colour.blue())
     await interaction.channel.send(embed = embed, view = ticket_launcher())
     await interaction.response.send_message("Ticketing system launched!", ephemeral = True)
 
