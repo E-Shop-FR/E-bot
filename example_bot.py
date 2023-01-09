@@ -11,18 +11,37 @@ class ticket_launcher(discord.ui.View):
 
     async def ticket(self, interaction: discord.Interaction, button:discord.ui.Button):
         ticket = utils.get(interaction.guild.text_channels, name = f"ticket-for-{interaction.user.name}-{interaction.user.discriminator}")
+        
+        
         if ticket is not None: await interaction.response.send_message(f"You already have aticket open at {ticket.mention=}!", ephemeral = True )
         else:
             overwrites = {
                 interaction.guild.default_role: discord.PermissionOverwrite(view_channel = False),
-                interaction.guild.default_role: discord.PermissionOverwrite(view_channel = True, send_messages = True, attach_files = True, embed_links = True),
+                interaction.user: discord.PermissionOverwrite(view_channel = True, send_messages = True, attach_files = True, embed_links = True),
                 interaction.guild.me: discord.PermissionOverwrite(view_channel = True, send_messages = True, read_message_history = True)
             }
 
             channel = await interaction.guild.create_text_channel(name = f"ticket-for-{interaction.user.name}-{interaction.user.discriminator}", overwrites = overwrites, reason = f"Ticket for {interaction.user}")
-            await channel.send(f"{interaction.user.mention} created a ticket !")
+            await channel.send(f"{interaction.user.mention} created a ticket !", view = main)
             await interaction.response.send_message(f"I've opened a ticket for you at {channel.mention}!" , ephemeral = True)
 
+class confirm(discord.ui.View):
+    def __init__(self) -> None:
+        super().__init__(timeout = None)
+
+    @discord.ui.button(label = "Confirm" , style = discord.ButtonStyle.red, custom_id = "confirm")
+    async def confirm_button(self, interaction, button):
+        try: await interaction.channel.delete()
+        except: await interaction.response.send_message("Channel deletion failed! Make sure I have 'manage_channels' permissions!", ephemeral = True)
+
+class main(discord.ui.View):
+    def __init__(self) -> None:
+        super().__init__(timeout = None)
+
+    @discord.ui.button(label = "Close Ticket" , style = discord.ButtonStyle.red, custom_id = "close")
+    async def close(self, interaction, button):
+        embed = discord.Embed(title = "Are you sure you want to close this ticket ?", color = discord.Colour.blurple())
+        await interaction.response.send_message(embed = embed, ephemeral = True)
 
 class AClient(discord.Client):
     def __init__(self):
@@ -81,6 +100,20 @@ async def ticketing(interaction: discord.Interaction):
     await interaction.channel.send(embed = embed, view = ticket_launcher())
     await interaction.response.send_message("Ticketing system launched!", ephemeral = True)
 
+@tree.command(name="close",guild=discord.Object(id=1046437841447686226), description = "close the ticket")
+async def close(interaction: discord.Interaction):
+    if "ticket-for-" in interaction.channel.name:
+        embed = discord.Embed(title = "Are you sure you want to close this ticket ?", color = discord.Colour.blurple())
+        await interaction.response.send_message(embed = embed, view = confirm(), ephemeral = True)
+    else: await interaction.response.send_message("This isn't a ticket !", ephemeral = True)
+
+@tree.command(name="add",guild=discord.Object(id=1046437841447686226), description = "Adds a user to the ticket")
+@app_commands.describe(user = "The user you want to add to the ticket")
+async def add(interaction: discord.Interaction, user: discord.member):
+    if "ticket-for-" in interaction.channel.name:
+        await interaction.channel.set_permissions(user, view_channel = True, send_messages = True, attach_files = True, embed_links = True)
+        
+    else: await interaction.response.send_message("This isn't a ticket!", ephemeral = True)
 
 
 client.run("MTA1MTIwMjUxMDI5MzA1NzY0Nw.GviMZU.SRCECZQ8H5ezfW7LVOMszIpM4gQ48GPlka8H0w")
