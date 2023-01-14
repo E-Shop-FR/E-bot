@@ -1,5 +1,6 @@
 import discord
 from discord import app_commands, utils
+from discord.ext import commands
 
 import config
 
