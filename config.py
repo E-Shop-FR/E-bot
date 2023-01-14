@@ -1,5 +1,6 @@
 import json
 import os
+from json import JSONDecodeError
 
 config_path = "resources/config.json"
 
@@ -13,13 +14,21 @@ def get(field: str):
         open(config_path, "x")
         return ""
     with open(config_path, "r") as f:
-        json_data = json.load(f)
+        # data = json.load(f)
         fields = field.split(".")
-        value = json_data
+        value = f.read()
         for field_name in fields:
-            if type(value) != dict:
+            if type(value) == str:
+                try:
+                    data = json.loads(value)
+                except JSONDecodeError:
+                    return ""
+            elif type(value) == dict:
+                data = value
+            else:
                 return ""
-            value = get_in_dict(json_data, field_name)
+
+            value = get_in_dict(data, field_name)
             if value is None:
                 return ""
         return value

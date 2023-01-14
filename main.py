@@ -1,5 +1,6 @@
 import discord
 from discord import app_commands, utils
+from discord.ext import commands
 
 import config
 
@@ -149,6 +150,7 @@ async def add(interaction: discord.Interaction, user: discord.Member):
         await interaction.response.send_message("This isn't a ticket!", ephemeral=True)
 
 if __name__ == '__main__':
+    print(config.get("suicidaul"))
     token = config.get_token()
     if token is None or token == "":
         print("Invalid token ! Please specify a valid one in the config file !")
