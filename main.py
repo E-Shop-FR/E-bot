@@ -53,11 +53,40 @@ class MainView(discord.ui.View):
     def __init__(self) -> None:
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Close Ticker", custom_id="ticket_button_close", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="Close Ticket", custom_id="ticket_button_close", style=discord.ButtonStyle.red)
     async def close(self, interaction: discord.Interaction, button: discord.ui.Button):
         print("clicked")
         embed = discord.Embed(title="Are you sure you want to close this ticket ?", color=discord.Colour.blurple())
         await interaction.response.send_message(embed=embed, view=ConfirmView(), ephemeral=True)
+
+    @discord.ui.button(label="Archive Ticket", custom_id="ticket_archive", style=discord.ButtonStyle.blurple)
+    async def archive(self, interaction: discord.Interaction, button: discord.ui.Button):
+        print("archived")
+        embed = discord.Embed(title="Are you sure you want to archive this ticket ?", color=discord.Colour.blurple())
+        await interaction.response.send_message(embed=embed, view= ArchiveConfirm(), ephemeral=True)
+
+
+class ArchiveConfirm(discord.ui.View):
+    def __init__(self) -> None:
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Confirm", style=discord.ButtonStyle.red, custom_id="confirm")
+    async def confirm_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        try:
+            category= discord.utils.get(interaction.guild.categories, id=1061049218569084948)
+            channel = interaction.channel
+            if channel.category == category : 
+                await interaction.response.send_message("You cannot archive the ticket twice !",ephemeral= True)
+                return
+
+            await channel.edit(category=category, name=channel.name+"-archived")
+            await interaction.response.defer()
+        except:
+            await interaction.response.send_message(
+                "Channel moving failed! Make sure I have 'manage_channels' permissions!", ephemeral=True)
+
+
+
 
 
 class AClient(discord.Client):
