@@ -2,7 +2,8 @@ import json
 import os
 from json import JSONDecodeError
 
-config_path = "resources/config.json"
+config_dir = "resources"
+config_path = config_dir + "/config.json"
 
 
 def get_token():
@@ -11,6 +12,7 @@ def get_token():
 
 def get(field: str):
     if not os.path.exists(config_path):
+        os.makedirs(config_dir, exist_ok=True)
         open(config_path, "x")
         return ""
     with open(config_path, "r") as f:
