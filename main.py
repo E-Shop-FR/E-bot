@@ -5,6 +5,39 @@ from discord.ext import commands
 import config
 
 
+class AClient(discord.Client):
+    def __init__(self, intents):
+        super().__init__(intents=intents)
+        self.synced = False
+        self.added = False
+
+    async def on_ready(self):
+        await self.wait_until_ready()
+        if not self.synced:
+            await tree.sync(guild=discord.Object(id=1046437841447686226))
+            self.synced = True
+        if not self.added:
+            self.add_view(TickerLauncher())
+            self.added = True
+        print(f"We have logged in as {self.user}.")
+
+    async def setup_hook(self) -> None:
+        # Register the persistent view for listening here.
+        # Note that this does not send the view to any message.
+        # In order to do this you need to first send a message with the View, which is shown below.
+        # If you have the message_id you can also pass it as a keyword argument, but for this example
+        # we don't have one.
+        self.add_view(MainView())
+        self.add_view(TickerLauncher())
+        self.add_view(ConfirmView())
+
+
+intents = discord.Intents.default()
+intents.members = True
+client = AClient(intents=intents)
+tree = app_commands.CommandTree(client)
+
+
 class TickerLauncher(discord.ui.View):
     def __init__(self) -> None:
         super().__init__(timeout=None)
@@ -92,47 +125,6 @@ class ArchiveConfirm(discord.ui.View):
 
 
 
-class AClient(discord.Client):
-    def __init__(self):
-        super().__init__(intents=discord.Intents.default())
-        self.synced = False
-        self.added = False
-
-    async def on_ready(self):
-        await self.wait_until_ready()
-        if not self.synced:
-            await tree.sync(guild=discord.Object(id=1046437841447686226))
-            self.synced = True
-        if not self.added:
-            self.add_view(TickerLauncher())
-            self.added = True
-        print(f"We have logged in as {self.user}.")
-
-    async def on_message(self, message):
-        if message.author == self.user:
-            return
-
-        if message.content.startswith('$hello'):
-            await message.channel.send('Hello World!')
-
-    async def on_member_join(self, member):
-        print(member)
-
-    async def setup_hook(self) -> None:
-        # Register the persistent view for listening here.
-        # Note that this does not send the view to any message.
-        # In order to do this you need to first send a message with the View, which is shown below.
-        # If you have the message_id you can also pass it as a keyword argument, but for this example
-        # we don't have one.
-        self.add_view(MainView())
-        self.add_view(TickerLauncher())
-        self.add_view(ConfirmView())
-
-
-client = AClient()
-tree = app_commands.CommandTree(client)
-
-
 @tree.command(name="fact", description="Tells a TRUE fact", guild=discord.Object(id=1046437841447686226))
 async def self(interaction: discord.Interaction, name: str, numb: int):
     await interaction.response.send_message(f"Suicidaul le pdddddddddd {name} {numb}")
@@ -179,6 +171,14 @@ async def add(interaction: discord.Interaction, user: discord.Member):
 
     else:
         await interaction.response.send_message("This isn't a ticket!", ephemeral=True)
+
+
+@client.event
+async def on_member_join(member):
+    channel = member.guild.system_channel
+    await channel.send(f"Wewewe bvn {member.mention}")
+
+
 
 if __name__ == '__main__':
     token = config.get_token()
