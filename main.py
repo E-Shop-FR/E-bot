@@ -28,10 +28,12 @@ class TickerLauncher(discord.ui.View):
                 interaction.guild.me: discord.PermissionOverwrite(view_channel=True, send_messages=True,
                                                                   read_message_history=True)
             }
-
+            
+            category= discord.utils.get(interaction.guild.categories, id=1059120888064249988)
             channel = await interaction.guild.create_text_channel(
                 name=channel_name, overwrites=overwrites,
-                reason=f"Ticket for {interaction.user}")
+                reason=f"Ticket for {interaction.user}",
+                category = category)
             await channel.send(f"{interaction.user.mention} created a ticket !", view=MainView())
             await interaction.response.send_message(f"I've opened a ticket for you at {channel.mention}!",
                                                     ephemeral=True)
@@ -153,8 +155,8 @@ async def self(ctx, amount: int = None):  # Set default value as None
 
 @tree.command(name="ticket", guild=discord.Object(id=1046437841447686226), description="Launches the ticketing system")
 async def ticketing(interaction: discord.Interaction):
-    embed = discord.Embed(title="If you need support, click the button below and create a ticket ! ",
-                          color=discord.Colour.blue())
+    embed = discord.Embed(title=":flag_gb::flag_us: If you need support or want to order, click the button below and create a ticket ! \n \n:flag_fr: Si vous avez besoin d'aide ou passer commande ,Clickez sur le boutons en desous et crée un ticket !",
+                            color=discord.Colour.blue())
     await interaction.channel.send(embed=embed, view=TickerLauncher())
     await interaction.response.send_message("Ticketing system launched!", ephemeral=True)
 
