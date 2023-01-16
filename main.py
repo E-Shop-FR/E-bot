@@ -30,6 +30,7 @@ class AClient(discord.Client):
         self.add_view(MainView())
         self.add_view(TickerLauncher())
         self.add_view(ConfirmView())
+        self.add_view(ArchiveConfirm())
 
 
 intents = discord.Intents.default()
@@ -120,14 +121,6 @@ class ArchiveConfirm(discord.ui.View):
         except:
             await interaction.response.send_message(
                 "Channel moving failed! Make sure I have 'manage_channels' permissions!", ephemeral=True)
-
-
-
-
-
-@tree.command(name="fact", description="Tells a TRUE fact", guild=discord.Object(id=1046437841447686226))
-async def self(interaction: discord.Interaction, name: str, numb: int):
-    await interaction.response.send_message(f"Suicidaul le pdddddddddd {name} {numb}")
 
 
 @tree.command(name="clear", description="Clear messages", guild=discord.Object(id=1046437841447686226))
