@@ -1,11 +1,16 @@
+"""
+Classe principale du bot.
+"""
+# Imports
 import discord
 from discord import app_commands, utils
-from discord.ext import commands
-
 import config
 
-
+# Initisalisation du bot
 class AClient(discord.Client):
+    '''
+    Discord client
+    '''
     def __init__(self, intents):
         super().__init__(intents=intents)
         self.synced = False
@@ -19,42 +24,40 @@ class AClient(discord.Client):
         if not self.added:
             self.add_view(TickerLauncher())
             self.added = True
-        print(f"We have logged in as {self.user}.")
+        print(f"Connexion réussie : {self.user}.")
 
     async def setup_hook(self) -> None:
-        # Register the persistent view for listening here.
-        # Note that this does not send the view to any message.
-        # In order to do this you need to first send a message with the View, which is shown below.
-        # If you have the message_id you can also pass it as a keyword argument, but for this example
-        # we don't have one.
         self.add_view(MainView())
         self.add_view(TickerLauncher())
         self.add_view(ConfirmView())
 
 
 intents = discord.Intents.default()
-intents.members = True
 client = AClient(intents=intents)
 tree = app_commands.CommandTree(client)
 
-
+# Système de tickets
 class TickerLauncher(discord.ui.View):
+    '''
+    TODO
+    '''
     def __init__(self) -> None:
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Create a Ticket", custom_id="ticket_button", style=discord.ButtonStyle.blurple)
+    # Bouton de création de ticket
+    @discord.ui.button(label="🎫 Ticket", custom_id="ticket_button", style=discord.ButtonStyle.blurple)
     async def ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
-        channel_name = f"ticket-for-{interaction.user.name}-{interaction.user.discriminator}".lower()
-        print(channel_name)
+        channel_name = f"🎫︱ticket-{interaction.user.name}-{interaction.user.discriminator}".lower()
+
         ticket = utils.get(interaction.guild.channels, name=channel_name)
 
-        print(ticket)
-
         if ticket is not None:
-            await interaction.response.send_message(f"You already have a ticket open at {ticket.mention}!",
-                                                    ephemeral=True)
+            # Le ticket existe déjà
+            await interaction.response.send_message(f"🇬🇧🇺🇸 You already have a ticket open at {ticket.mention}!\n\n🇫🇷 Vous avez déjà un ticket ouvert à {ticket.mention}!", ephemeral=True)
         else:
+            # Création du ticket
             overwrites = {
+                # Permissions
                 interaction.guild.default_role: discord.PermissionOverwrite(view_channel=False),
                 interaction.user: discord.PermissionOverwrite(view_channel=True, send_messages=True, attach_files=True,
                                                               embed_links=True),
@@ -62,47 +65,56 @@ class TickerLauncher(discord.ui.View):
                                                                   read_message_history=True)
             }
             
+            # Création du channel
             category= discord.utils.get(interaction.guild.categories, id=1059120888064249988)
             channel = await interaction.guild.create_text_channel(
                 name=channel_name, overwrites=overwrites,
                 reason=f"Ticket for {interaction.user}",
                 category = category)
-            await channel.send(f"{interaction.user.mention} created a ticket !", view=MainView())
-            await interaction.response.send_message(f"I've opened a ticket for you at {channel.mention}!",
+
+            await channel.send(f"🇬🇧🇺🇸 {interaction.user.mention} created a ticket ! Please give as much detail as possible about your request.\n\n 🇫🇷 {interaction.user.mention} viens de créer un ticket ! Merci de nous donner le plus de détails possibles sur votre demande.", view=MainView())
+            await interaction.response.send_message(f"🇬🇧🇺🇸 I've opened a ticket for you at {channel.mention}!\n\n🇫🇷 J'ai ouvert un ticket pour vous ici {channel.mention}!",
                                                     ephemeral=True)
 
-
+# Système de fermeture de tickets
 class ConfirmView(discord.ui.View):
+    '''
+    TODO
+    '''
     def __init__(self) -> None:
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Confirm", style=discord.ButtonStyle.red, custom_id="confirm")
+    @discord.ui.button(label="Confirmation", style=discord.ButtonStyle.red, custom_id="confirm")
     async def confirm_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
             await interaction.channel.delete()
         except:
             await interaction.response.send_message(
-                "Channel deletion failed! Make sure I have 'manage_channels' permissions!", ephemeral=True)
+                "🇬🇧🇺🇸 I can't delete this channel. Please check that i have the MANAGE_CHANNELS permission.\n\n🇫🇷 Impossible de supprimer le channel ! Merci de vérifier que je possède la permission MANAGE_CHANNELS", ephemeral=True)
 
 
 class MainView(discord.ui.View):
+    '''
+    TODO
+    '''
     def __init__(self) -> None:
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Close Ticket", custom_id="ticket_button_close", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="Close", custom_id="ticket_button_close", style=discord.ButtonStyle.red)
     async def close(self, interaction: discord.Interaction, button: discord.ui.Button):
-        print("clicked")
-        embed = discord.Embed(title="Are you sure you want to close this ticket ?", color=discord.Colour.blurple())
+        embed = discord.Embed(title="🇬🇧🇺🇸 Are you sure you want to close this ticket ?\n\n🇫🇷 Voulez-vous vraiment fermer ce ticket ?", color=discord.Colour.blurple())
         await interaction.response.send_message(embed=embed, view=ConfirmView(), ephemeral=True)
 
-    @discord.ui.button(label="Archive Ticket", custom_id="ticket_archive", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="Archive", custom_id="ticket_archive", style=discord.ButtonStyle.blurple)
     async def archive(self, interaction: discord.Interaction, button: discord.ui.Button):
-        print("archived")
-        embed = discord.Embed(title="Are you sure you want to archive this ticket ?", color=discord.Colour.blurple())
+        embed = discord.Embed(title="🇬🇧🇺🇸 Are you sure you want to archive this ticket ?\n\n🇫🇷 Voulez-vous vraiment archiver ce ticket ?", color=discord.Colour.blurple())
         await interaction.response.send_message(embed=embed, view= ArchiveConfirm(), ephemeral=True)
 
 
 class ArchiveConfirm(discord.ui.View):
+    '''
+    TODO
+    '''
     def __init__(self) -> None:
         super().__init__(timeout=None)
 
@@ -112,26 +124,29 @@ class ArchiveConfirm(discord.ui.View):
             category= discord.utils.get(interaction.guild.categories, id=1061049218569084948)
             channel = interaction.channel
             if channel.category == category : 
-                await interaction.response.send_message("You cannot archive the ticket twice !",ephemeral= True)
+                
+                await interaction.response.send_message("🇬🇧🇺🇸 You cannot archive a ticket twice !\n\n🇫🇷 Vous ne pouvez-pas archiver un ticket déjà archivé !",ephemeral= True)
                 return
 
             await channel.edit(category=category, name=channel.name+"-archived")
             await interaction.response.defer()
         except:
             await interaction.response.send_message(
-                "Channel moving failed! Make sure I have 'manage_channels' permissions!", ephemeral=True)
+                "🇬🇧🇺🇸 I can't archive this channel. Please check that i have the MANAGE_CHANNELS permission.\n\n🇫🇷 Impossible d'archiver le channel ! Merci de vérifier que je possède la permission MANAGE_CHANNELS", ephemeral=True)
 
+# Commands
+@tree.command(name="ping", description="Pong !", guild=discord.Object(id=1046437841447686226))
+async def ping(interaction: discord.Interaction):
+    '''
+    Renvoie la latence du bot
+    '''
+    await interaction.response.send_message((f"🏓 Pong ! {round(client.latency, 3)} ms!"))
 
-
-
-
-@tree.command(name="fact", description="Tells a TRUE fact", guild=discord.Object(id=1046437841447686226))
-async def self(interaction: discord.Interaction, name: str, numb: int):
-    await interaction.response.send_message(f"Suicidaul le pdddddddddd {name} {numb}")
-
-
-@tree.command(name="clear", description="Clear messages", guild=discord.Object(id=1046437841447686226))
-async def self(ctx, amount: int = None):  # Set default value as None
+@tree.command(name="clear", description="Retirer des messages d'un channel", guild=discord.Object(id=1046437841447686226))
+async def self(ctx, amount: int = None):  
+    '''
+    Retire des messages d'un channel
+    '''
     await ctx.response.defer(ephemeral=True)
     if amount is None:
         await ctx.channel.purge(limit=1000000)
@@ -139,43 +154,44 @@ async def self(ctx, amount: int = None):  # Set default value as None
         try:
             int(amount)
         except Exception:  # Error handler
-            await ctx.send('Please enter a valid integer as amount.')
+            await ctx.send('🇬🇧🇺🇸 Please enter a valid integer as amount.\n\n🇫🇷 Veuillez entrer un nombre entier valide comme montant.', ephemeral=True)
         else:
-            await ctx.followup.send(f"Cleared {amount} messages.", ephemeral=True)
+            await ctx.followup.send(f'🇬🇧🇺🇸 {amount} messages deleted.\n\n🇫🇷 {amount} messages supprimés.', ephemeral=True)
             await ctx.channel.purge(limit=amount)
 
-
-@tree.command(name="ticket", guild=discord.Object(id=1046437841447686226), description="Launches the ticketing system")
+# Commandes
+@tree.command(name="ticket", guild=discord.Object(id=1046437841447686226), description="Lance le système de ticket en affichant le message avec la réaction")
 async def ticketing(interaction: discord.Interaction):
-    embed = discord.Embed(title=":flag_gb::flag_us: If you need support or want to order, click the button below and create a ticket ! \n \n:flag_fr: Si vous avez besoin d'aide ou passer commande ,Clickez sur le boutons en desous et crée un ticket !",
+    embed = discord.Embed(title="🇬🇧🇺🇸 If you need support or want to order, click the button below to create a ticket ! \n\n🇫🇷 Si vous avez besoin d'aide ou que vous souhaitez passer commande, clickez sur le bouton ci-dessous pour créer un ticket !",
                             color=discord.Colour.blue())
     await interaction.channel.send(embed=embed, view=TickerLauncher())
     await interaction.response.send_message("Ticketing system launched!", ephemeral=True)
 
 
-@tree.command(name="close", guild=discord.Object(id=1046437841447686226), description="close the ticket")
+@tree.command(name="close", guild=discord.Object(id=1046437841447686226), description="Ferme le ticket")
 async def close(interaction: discord.Interaction):
     if "ticket-for-" in interaction.channel.name:
-        embed = discord.Embed(title="Are you sure you want to close this ticket ?", color=discord.Colour.blurple())
+        embed = discord.Embed(title="🇬🇧🇺🇸 Are you sure you want to close this ticket ?\n\n🇫🇷Voulez-vous vraiment fermer ce ticket ?", color=discord.Colour.blurple())
         await interaction.response.send_message(embed=embed, view=ConfirmView(), ephemeral=True)
     else:
-        await interaction.response.send_message("This isn't a ticket !", ephemeral=True)
+        await interaction.response.send_message("🇺🇸🇬🇧 This channel isn't a ticket !\n\n🇫🇷Ce channel n'est pas un ticket !", ephemeral=True)
 
 
-@tree.command(name="add", guild=discord.Object(id=1046437841447686226), description="Adds a user to the ticket")
-@app_commands.describe(user="The user you want to add to the ticket")
+@tree.command(name="add", guild=discord.Object(id=1046437841447686226), description="Ajoute un utilisateur au ticket")
+@app_commands.describe(user="L'utilisateur à ajouter au ticket")
 async def add(interaction: discord.Interaction, user: discord.Member):
     if "ticket-for-" in interaction.channel.name:
         await interaction.channel.set_permissions(user, view_channel=True, send_messages=True, attach_files=True,
                                                   embed_links=True)
 
     else:
-        await interaction.response.send_message("This isn't a ticket!", ephemeral=True)
+        await interaction.response.send_message("🇺🇸🇬🇧 This channel isn't a ticket !\n\n🇫🇷 Ce channel n'est pas un ticket !", ephemeral=True)
 
 
 @client.event
 async def on_member_join(member):
     channel = member.guild.system_channel
+    # TODO Embed
     await channel.send(f"Wewewe bvn {member.mention}")
 
 
@@ -183,6 +199,6 @@ async def on_member_join(member):
 if __name__ == '__main__':
     token = config.get_token()
     if token is None or token == "":
-        print("Invalid token ! Please specify a valid one in the config file !")
+        print("Le token n'est pas valide ! Veuillez le renseigner dans le fichier config.json.")
     else:
         client.run(token)
