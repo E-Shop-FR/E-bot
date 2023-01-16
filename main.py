@@ -84,7 +84,7 @@ class ConfirmView(discord.ui.View):
     def __init__(self) -> None:
         super().__init__(timeout=None)
 
-    @discord.ui.button(label="Confirmation", style=discord.ButtonStyle.red, custom_id="confirm")
+    @discord.ui.button(label="Confirm", style=discord.ButtonStyle.red, custom_id="confirm")
     async def confirm_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
             await interaction.channel.delete()
