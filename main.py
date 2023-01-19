@@ -136,6 +136,7 @@ class ArchiveConfirm(discord.ui.View):
             await interaction.response.send_message(
                 "🇬🇧🇺🇸 I can't archive this channel. Please check that i have the MANAGE_CHANNELS permission.\n\n🇫🇷 Impossible d'archiver le channel ! Merci de vérifier que je possède la permission MANAGE_CHANNELS", ephemeral=True)
 
+
 # Commandes
 @tree.command(name="ping", description="Pong !", guild=discord.Object(id=1046437841447686226))
 async def ping(interaction: discord.Interaction):
@@ -190,10 +191,14 @@ async def add(interaction: discord.Interaction, user: discord.Member):
     else:
         await interaction.response.send_message("🇺🇸🇬🇧 This channel isn't a ticket !\n\n🇫🇷 Ce channel n'est pas un ticket !", ephemeral=True)
 
+# Commandes
+@tree.command(name="feedback", guild=discord.Object(id=1046437841447686226), description="Lance le système de feedback")
+async def launchefeedback(interaction: discord.Interaction):
+    embed = discord.Embed(title="🇬🇧🇺🇸 anglais ! \n\n🇫🇷 francais  !",
+                            color=discord.Colour.blue())
+    await interaction.channel.send(embed=embed ) #view= a rajouter ici
+    await interaction.response.send_message("feedback système launched", ephemeral=True)
 
-@tree.command(name="feedback", guild=discord.Object(id=1046437841447686226), description="demande au client de rajouter un commentaire")
-async def feedback(interaction: discord.Interaction, user: discord.Member):
-    await interaction.response.send_message("ahahahah ez sa fonctionne pas encore")
 
 @client.event
 async def on_member_join(member):
