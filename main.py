@@ -37,6 +37,7 @@ intents = discord.Intents.default()
 client = AClient(intents=intents)
 tree = app_commands.CommandTree(client)
 
+
 # Système de tickets
 class TickerLauncher(discord.ui.View):
     '''
@@ -111,7 +112,7 @@ class MainView(discord.ui.View):
         embed = discord.Embed(title="🇬🇧🇺🇸 Are you sure you want to archive this ticket ?\n\n🇫🇷 Voulez-vous vraiment archiver ce ticket ?", color=discord.Colour.blurple())
         await interaction.response.send_message(embed=embed, view= ArchiveConfirm(), ephemeral=True)
 
-
+# Système d'archivation de tickets
 class ArchiveConfirm(discord.ui.View):
     '''
     TODO
@@ -135,7 +136,7 @@ class ArchiveConfirm(discord.ui.View):
             await interaction.response.send_message(
                 "🇬🇧🇺🇸 I can't archive this channel. Please check that i have the MANAGE_CHANNELS permission.\n\n🇫🇷 Impossible d'archiver le channel ! Merci de vérifier que je possède la permission MANAGE_CHANNELS", ephemeral=True)
 
-# Commands
+# Commandes
 @tree.command(name="ping", description="Pong !", guild=discord.Object(id=1046437841447686226))
 async def ping(interaction: discord.Interaction):
     '''
@@ -143,6 +144,7 @@ async def ping(interaction: discord.Interaction):
     '''
     await interaction.response.send_message((f"🏓 Pong ! {round(client.latency, 3)} ms!"))
 
+# Commandes
 @tree.command(name="clear", description="Retirer des messages d'un channel", guild=discord.Object(id=1046437841447686226))
 async def self(ctx, amount: int = None):  
     '''
@@ -168,7 +170,7 @@ async def ticketing(interaction: discord.Interaction):
     await interaction.channel.send(embed=embed, view=TickerLauncher())
     await interaction.response.send_message("Ticketing system launched!", ephemeral=True)
 
-
+# Commandes
 @tree.command(name="close", guild=discord.Object(id=1046437841447686226), description="Ferme le ticket")
 async def close(interaction: discord.Interaction):
     if "ticket-for-" in interaction.channel.name:
@@ -177,7 +179,7 @@ async def close(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("🇺🇸🇬🇧 This channel isn't a ticket !\n\n🇫🇷Ce channel n'est pas un ticket !", ephemeral=True)
 
-
+# Commandes
 @tree.command(name="add", guild=discord.Object(id=1046437841447686226), description="Ajoute un utilisateur au ticket")
 @app_commands.describe(user="L'utilisateur à ajouter au ticket")
 async def add(interaction: discord.Interaction, user: discord.Member):
@@ -188,6 +190,10 @@ async def add(interaction: discord.Interaction, user: discord.Member):
     else:
         await interaction.response.send_message("🇺🇸🇬🇧 This channel isn't a ticket !\n\n🇫🇷 Ce channel n'est pas un ticket !", ephemeral=True)
 
+
+@tree.command(name="feedback", guild=discord.Object(id=1046437841447686226), description="demande au client de rajouter un commentaire")
+async def feedback(interaction: discord.Interaction, user: discord.Member):
+    await interaction.response.send_message("ahahahah ez sa fonctionne pas encore")
 
 @client.event
 async def on_member_join(member):
