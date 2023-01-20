@@ -136,6 +136,21 @@ class ArchiveConfirm(discord.ui.View):
             await interaction.response.send_message(
                 "🇬🇧🇺🇸 I can't archive this channel. Please check that i have the MANAGE_CHANNELS permission.\n\n🇫🇷 Impossible d'archiver le channel ! Merci de vérifier que je possède la permission MANAGE_CHANNELS", ephemeral=True)
 
+# feedback système
+class FeedBack(discord.ui.View):
+    '''
+    TODO
+    '''
+    def __init__(self) -> None:
+        super().__init__(timeout=None)
+        self.tab=[None, None, None]
+    
+    # bouton pour lancer le début du feedback
+    @discord.ui.button(label="Commente", custom_id="commant_button", style=discord.ButtonStyle.blurple)
+    async def feedbacklaunch(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.tab[0]= str({interaction.user.name}-{interaction.user.discriminator})
+        await interaction.response.send_message("écrit maintenant ton commentaire", ephemeral=True)
+
 
 # Commandes
 @tree.command(name="ping", description="Pong !", guild=discord.Object(id=1046437841447686226))
@@ -196,7 +211,7 @@ async def add(interaction: discord.Interaction, user: discord.Member):
 async def launchefeedback(interaction: discord.Interaction):
     embed = discord.Embed(title="🇬🇧🇺🇸 anglais ! \n\n🇫🇷 francais  !",
                             color=discord.Colour.blue())
-    await interaction.channel.send(embed=embed ) #view= a rajouter ici
+    await interaction.channel.send(embed=embed, view=FeedBack()) 
     await interaction.response.send_message("feedback système launched", ephemeral=True)
 
 
