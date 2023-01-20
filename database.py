@@ -21,6 +21,7 @@ try :
     cur.execute("""CREATE TABLE IF NOT EXISTS avis(
             id_commentaire INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
             id_client INTEGER NOT NULL,
+            avatar_client TEXT NOT NULL,
             date_publication TEXT NOT NULL,
             pseudo_vendeur TEXT NOT NULL,
             commentaire TEXT NOT NULL, 
@@ -54,12 +55,13 @@ def add_avis(user : discord.Member, pseudo_vendeur: int, commentaire: str, note:
     '''
     pseudo_client = user.name
     id_client = user.id
-    avatar = user.display_avatar
+    avatar = str(user.avatar)
+    print(avatar)
     date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     cur.execute("""INSERT OR REPLACE INTO comptes (id_discord, pseudo) VALUES (?, ?)""", (id_client, pseudo_client))
-    cur.execute("""INSERT INTO avis (id_client, date_publication, pseudo_vendeur, commentaire, note) VALUES (?, ?, ?, ?, ?)""",
-                (id_client, date, pseudo_vendeur, commentaire, note))
+    cur.execute("""INSERT INTO avis (id_client, avatar_client, date_publication, pseudo_vendeur, commentaire, note) VALUES (?, ?, ?, ?, ?, ?)""",
+                (id_client, avatar, date, pseudo_vendeur, commentaire, note))
     con.commit()
 
 def remove_avis(id_commentaire: int):

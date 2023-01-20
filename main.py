@@ -148,8 +148,9 @@ async def ping(interaction: discord.Interaction):
 @tree.command(name="test", description="Test dev", guild=discord.Object(id=1046437841447686226))
 async def test(interaction: discord.Interaction):
     '''
-    Test
+    Test dev
     '''
+    db.add_avis(interaction.user, "Test", "Carré", 5)
     await interaction.response.send_message("Test")
 
 # Commandes
