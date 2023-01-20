@@ -13,26 +13,27 @@ con = sqlite3.connect("resources/database.db")
 cur = con.cursor()
 
 # Création des tables
-try :
-    cur.execute("""CREATE TABLE IF NOT EXISTS comptes(
-            id_discord INTEGER PRIMARY KEY NOT NULL,
-            pseudo TEXT NOT NULL)""")
 
-    cur.execute("""CREATE TABLE IF NOT EXISTS avis(
+cur.execute("""CREATE TABLE IF NOT EXISTS comptes(
+            id_discord INTEGER PRIMARY KEY NOT NULL,
+            pseudo TEXT NOT NULL,
+            avatar TEXT NOT NULL
+            )""")
+
+cur.execute("""CREATE TABLE IF NOT EXISTS avis(
             id_commentaire INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
             id_client INTEGER NOT NULL,
-            avatar_client TEXT NOT NULL,
             date_publication TEXT NOT NULL,
             pseudo_vendeur TEXT NOT NULL,
             commentaire TEXT NOT NULL, 
             note INTEGER NOT NULL,
-            FOREIGN KEY(id_client) REFERENCES comptes(id_discord))""")
-    con.commit()
-except sqlite3.OperationalError:
-    print("Erreur lors de la création des tables")
-    exit()
+            FOREIGN KEY(id_client) REFERENCES comptes(id_discord)
+            )""")
+con.commit()
 
 # Méthodes SQL
+
+
 def get_all_avis():
     '''
     Renvoie les avis de tout le market
@@ -44,7 +45,7 @@ def get_all_avis():
     return cur.fetchall()
 
 
-def add_avis(user : discord.Member, pseudo_vendeur: int, commentaire: str, note: int):
+def add_avis(user: discord.Member, pseudo_vendeur: int, commentaire: str, note: int):
     '''
     Ajoute un avis à la base de données
     ---
@@ -55,13 +56,15 @@ def add_avis(user : discord.Member, pseudo_vendeur: int, commentaire: str, note:
     '''
     pseudo_client = user.name
     id_client = user.id
-    avatar = str(user.avatar)
+    avatar_client = str(user.avatar)
     date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    cur.execute("""INSERT OR REPLACE INTO comptes (id_discord, pseudo) VALUES (?, ?)""", (id_client, pseudo_client))
-    cur.execute("""INSERT INTO avis (id_client, avatar_client, date_publication, pseudo_vendeur, commentaire, note) VALUES (?, ?, ?, ?, ?, ?)""",
-                (id_client, avatar, date, pseudo_vendeur, commentaire, note))
+    cur.execute("""INSERT OR REPLACE INTO comptes (id_discord, avatar, pseudo) VALUES (?, ?, ?)""",
+                (id_client, pseudo_client, avatar_client))
+    cur.execute("""INSERT INTO avis (id_client, date_publication, pseudo_vendeur, commentaire, note) VALUES (?, ?, ?, ?, ?)""",
+                (id_client, date, pseudo_vendeur, commentaire, note))
     con.commit()
+
 
 def remove_avis(id_commentaire: int):
     '''
@@ -69,8 +72,10 @@ def remove_avis(id_commentaire: int):
     ---
     id_commentaire: ID du commentaire
     '''
-    cur.execute("""DELETE FROM avis WHERE id_commentaire = ?""", (id_commentaire,))
+    cur.execute("""DELETE FROM avis WHERE id_commentaire = ?""",
+                (id_commentaire,))
     con.commit()
+
 
 def get_client_avis(id_client: int):
     '''
@@ -101,6 +106,7 @@ def get_vendeur_avis(pseudo_vendeur: str):
                 ORDER BY avis.note DESC""", (pseudo_vendeur, ))
     return cur.fetchall()
 
+
 def get_vendeur_moyenne(pseudo_vendeur: str):
     '''
     Renvoie la note moyenne d'un vendeur
@@ -112,7 +118,8 @@ def get_vendeur_moyenne(pseudo_vendeur: str):
     cur.execute("""SELECT AVG(avis.note) FROM avis
                 WHERE avis.pseudo_vendeur = ?""", (pseudo_vendeur, ))
     return cur.fetchone()[0]
-    
+
+
 def get_vendeur_nb_avis(pseudo_vendeur: str):
     '''
     Renvoie le nombre d'avis d'un vendeur
