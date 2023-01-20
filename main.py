@@ -5,6 +5,7 @@ Classe principale du bot.
 import discord
 from discord import app_commands, utils
 import config
+import database as db
 
 # Initisalisation du bot
 class AClient(discord.Client):
@@ -36,7 +37,6 @@ class AClient(discord.Client):
 intents = discord.Intents.default()
 client = AClient(intents=intents)
 tree = app_commands.CommandTree(client)
-
 
 # Système de tickets
 class TickerLauncher(discord.ui.View):
@@ -145,6 +145,13 @@ async def ping(interaction: discord.Interaction):
     '''
     await interaction.response.send_message((f"🏓 Pong ! {round(client.latency, 3)} ms!"))
 
+@tree.command(name="test", description="Test dev", guild=discord.Object(id=1046437841447686226))
+async def test(interaction: discord.Interaction):
+    '''
+    Test
+    '''
+    await interaction.response.send_message("Test")
+
 # Commandes
 @tree.command(name="clear", description="Retirer des messages d'un channel", guild=discord.Object(id=1046437841447686226))
 async def self(ctx, amount: int = None):  
@@ -206,11 +213,11 @@ async def on_member_join(member):
     # TODO Embed
     await channel.send(f"Wewewe bvn {member.mention}")
 
-
-
 if __name__ == '__main__':
     token = config.get_token()
     if token is None or token == "":
         print("Le token n'est pas valide ! Veuillez le renseigner dans le fichier config.json.")
     else:
         client.run(token)
+
+

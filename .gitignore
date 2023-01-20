@@ -1,3 +1,4 @@
 resources
 __pycache__
 test.py
+database.db
