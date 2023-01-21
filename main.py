@@ -342,7 +342,7 @@ async def pts_fidelite(interaction: discord.Interaction, acheteur = None, param 
 @client.event
 async def on_member_join(member):
     channel = member.guild.system_channel
-    # TODO MEGOUNEEET
+    # TODO MEGOUNEEETdf
     embed = discord.Embed(title=f"{member.name}#{member.discriminator}",
                           description="🇬🇧 Welcome !\n\n🇫🇷 Wesh mon negro !", color=discord.Colour.random())
     embed.set_thumbnail(url=f"{member.display_avatar}")
