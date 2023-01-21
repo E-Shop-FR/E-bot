@@ -141,20 +141,23 @@ class FeedBack(discord.ui.View):
     '''
     TODO
     '''
-    def __init__(self) -> None:
+    def __init__(self, freelancer = None, channel = None ) -> None:
         super().__init__(timeout=None)
-        self.tab=[None, None, None, None]
+        self.channel=channel
+        self.tab=[None, None, None, freelancer]
     
     # bouton pour lancer le début du feedback
     @discord.ui.button(label="Commente", custom_id="commant_button", style=discord.ButtonStyle.blurple)
     async def feedbacklaunch(self, interaction: discord.Interaction, button: discord.ui.Button):
         self.tab[0]= str({interaction.user.name}-{interaction.user.discriminator})
         await interaction.response.send_message("écrit maintenant ton commentaire", ephemeral=True)
+        self.tab
 
 
     # Button star
     @discord.ui.button(label="1star", custom_id="1_star", style=discord.ButtonStyle.blurple)
     async def star_1(self,interaction: discord.Interaction, button: discord.ui.Button):
+        self.tab[0]= str({interaction.user.name}-{interaction.user.discriminator})
         self.tab[2] = 1
         await interaction.response.send_message("Tu a mis 1 étoile", ephemeral=True)
 
@@ -162,6 +165,7 @@ class FeedBack(discord.ui.View):
     # Button star
     @discord.ui.button(label="2star", custom_id="2_star", style=discord.ButtonStyle.blurple)
     async def star_2(self,interaction: discord.Interaction, button: discord.ui.Button):
+        self.tab[0]= str({interaction.user.name}-{interaction.user.discriminator})
         self.tab[2]= 2
         await interaction.response.send_message("tu a mis 2 étoile", ephemeral=True)
 
@@ -169,6 +173,7 @@ class FeedBack(discord.ui.View):
     # Button star
     @discord.ui.button(label="3star", custom_id="3_star", style=discord.ButtonStyle.blurple)
     async def star_3(self,interaction: discord.Interaction, button: discord.ui.Button):
+        self.tab[0]= str({interaction.user.name}-{interaction.user.discriminator})
         self.tab[2]= 3
         await interaction.response.send_message("tu a mis 2 étoile", ephemeral=True)
 
@@ -176,14 +181,22 @@ class FeedBack(discord.ui.View):
     # Button star
     @discord.ui.button(label="4star", custom_id="4_star", style=discord.ButtonStyle.blurple)
     async def star_4(self,interaction: discord.Interaction, button: discord.ui.Button):
+        self.tab[0]= str({interaction.user.name}-{interaction.user.discriminator})
         self.tab[2]= 4
         await interaction.response.send_message("tu a mis 2 étoile", ephemeral=True)
 
     # Button star
     @discord.ui.button(label="5star", custom_id="5_star", style=discord.ButtonStyle.blurple)
     async def star_5(self,interaction: discord.Interaction, button: discord.ui.Button):
+        self.tab[0]= str({interaction.user.name}-{interaction.user.discriminator})
         self.tab[2]= 5
         await interaction.response.send_message("tu a mis 2 étoile", ephemeral=True)
+    
+    # Button fini
+    @discord.ui.button(label="finish", custom_id="comment_fini", style=discord.ButtonStyle.green)
+    async def finish(self,interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_message("voila votre commentaire est fini", ephemeral=True)
+        # demander a mega pour la db
 
 
 # Commandes
@@ -253,7 +266,7 @@ async def add(interaction: discord.Interaction, user: discord.Member):
 async def launchefeedback(interaction: discord.Interaction):
     embed = discord.Embed(title="🇬🇧🇺🇸 anglais ! \n\n🇫🇷 francais  !",
                             color=discord.Colour.blue())
-    await interaction.channel.send(embed=embed, view=FeedBack()) 
+    await interaction.channel.send(embed=embed, view=FeedBack({interaction.user.name}-{interaction.user.discriminator})) 
     await interaction.response.send_message("feedback système launched", ephemeral=True)
 
 
