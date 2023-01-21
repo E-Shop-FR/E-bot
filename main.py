@@ -1,17 +1,18 @@
-'''
+"""
 Classe principale du bot.
-'''
+"""
 # Imports
 import discord
+from discord import app_commands, utils
 import config
 import database as db
 
 
 # Initisalisation du bot
 class AClient(discord.Client):
-    '''
+    """
     Discord client
-    '''
+    """
 
     def __init__(self, intents):
         super().__init__(intents=intents)
@@ -37,13 +38,14 @@ class AClient(discord.Client):
 
 intents = discord.Intents.default()
 client = AClient(intents=intents)
-tree = discord.app_commands.CommandTree(client)
+tree = app_commands.CommandTree(client)
+
 
 # Système de tickets
 class TickerLauncher(discord.ui.View):
-    '''
+    """
     TODO
-    '''
+    """
 
     def __init__(self) -> None:
         super().__init__(timeout=None)
@@ -53,7 +55,7 @@ class TickerLauncher(discord.ui.View):
     async def ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
         channel_name = f"🎫︱ticket-{interaction.user.name}-{interaction.user.discriminator}".lower()
 
-        ticket = discord.utils.get(interaction.guild.channels, name=channel_name)
+        ticket = utils.get(interaction.guild.channels, name=channel_name)
 
         if ticket is not None:
             # Le ticket existe déjà
@@ -88,9 +90,9 @@ class TickerLauncher(discord.ui.View):
 
 # Système de fermeture de tickets
 class ConfirmView(discord.ui.View):
-    '''
+    """
     TODO
-    '''
+    """
 
     def __init__(self) -> None:
         super().__init__(timeout=None)
@@ -106,9 +108,9 @@ class ConfirmView(discord.ui.View):
 
 
 class MainView(discord.ui.View):
-    '''
+    """
     TODO
-    '''
+    """
 
     def __init__(self) -> None:
         super().__init__(timeout=None)
@@ -130,9 +132,9 @@ class MainView(discord.ui.View):
 
 # Système d'archivation de tickets
 class ArchiveConfirm(discord.ui.View):
-    '''
+    """
     TODO
-    '''
+    """
 
     def __init__(self) -> None:
         super().__init__(timeout=None)
@@ -158,9 +160,9 @@ class ArchiveConfirm(discord.ui.View):
 
 # feedback système
 class FeedBack(discord.ui.View):
-    '''
+    """
     TODO
-    '''
+    """
 
     def __init__(self, freelancer=None, channel=None) -> None:
         super().__init__(timeout=None)
@@ -222,17 +224,17 @@ class FeedBack(discord.ui.View):
 # Commandes
 @tree.command(name="ping", description="Pong !", guild=discord.Object(id=1046437841447686226))
 async def ping(interaction: discord.Interaction):
-    '''
+    """
     Renvoie la latence du bot
-    '''
+    """
     await interaction.response.send_message(f"🏓 Pong ! {round(client.latency, 3)} ms!")
 
 
 @tree.command(name="test", description="Test dev", guild=discord.Object(id=1046437841447686226))
 async def test(interaction: discord.Interaction):
-    '''
+    """
     Test dev
-    '''
+    """
     db.add_avis(interaction.user, "Test", "Carré", 5)
     await interaction.response.send_message("Test")
 
@@ -241,9 +243,9 @@ async def test(interaction: discord.Interaction):
 @tree.command(name="clear", description="Retirer des messages d'un channel",
               guild=discord.Object(id=1046437841447686226))
 async def self(ctx, amount: int = None):
-    '''
+    """
     Retire des messages d'un channel
-    '''
+    """
     await ctx.response.defer(ephemeral=True)
     if amount is None:
         await ctx.channel.purge(limit=1000000)
@@ -286,7 +288,7 @@ async def close(interaction: discord.Interaction):
 
 # Commandes
 @tree.command(name="add", guild=discord.Object(id=1046437841447686226), description="Ajoute un utilisateur au ticket")
-@discord.app_commands.describe(user="L'utilisateur à ajouter au ticket")
+@app_commands.describe(user="L'utilisateur à ajouter au ticket")
 async def add(interaction: discord.Interaction, user: discord.Member):
     if "ticket-for-" in interaction.channel.name:
         await interaction.channel.set_permissions(user, view_channel=True, send_messages=True, attach_files=True,
@@ -307,7 +309,20 @@ async def launchefeedback(interaction: discord.Interaction):
     await interaction.response.send_message("feedback système launched", ephemeral=True)
 
 # Commandes
-@tree.command(name="point_fidelite", guild=discord.Object(id=1046437841447686226), description="ajoute les point de fidéliter")
+@tree.command(name="point_fidelite", guild=discord.Object(id=1046437841447686226), description="ajoute les point de fidéliter", acheteur = None, param = None ,nbre_point = None)
+@app_commands.choices(param=[
+    discord.app_commands.Choice(name='create', value=1),
+    discord.app_commands.Choice(name='reset', value=2),
+    discord.app_commands.Choice(name='add', value=3),
+    discord.app_commands.Choice(name='remove', value=4)
+])
+
+@app_commands.choices(acheteur=[
+    discord.app_commands.Choice(name=discord.Member, value=1),
+])
+
+
+async def pts_fidelite(interaction: discord.Interaction, acheteur = None, param = None ,nbre_point = None):
 
 
 
