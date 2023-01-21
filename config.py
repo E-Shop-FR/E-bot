@@ -1,6 +1,6 @@
-"""
+'''
 Ce fichier permet de récupérer des valeurs dans le fichier de configuration.
-"""
+'''
 
 # Imports
 import os

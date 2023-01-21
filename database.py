@@ -32,20 +32,18 @@ cur.execute("""CREATE TABLE IF NOT EXISTS avis(
 con.commit()
 
 # Méthodes SQL
-
-
 def get_all_avis():
     '''
     Renvoie les avis de tout le market
     '''
-    cur.execute("""SELECT comptes.pseudo, avis.pseudo_vendeur, avis.commentaire, avis.note FROM avis
+    cur.execute('''SELECT comptes.pseudo, avis.pseudo_vendeur, avis.commentaire, avis.note FROM avis
                 JOIN comptes ON avis.id_client = comptes.id_discord
                 ORDER BY avis.note DESC
-                """)
+                ''')
     return cur.fetchall()
 
 
-def add_avis(user: discord.Member, pseudo_vendeur: int, commentaire: str, note: int):
+def add_avis(user: discord.Member, pseudo_vendeur: str, commentaire: str, note: int):
     '''
     Ajoute un avis à la base de données
     ---
@@ -59,9 +57,10 @@ def add_avis(user: discord.Member, pseudo_vendeur: int, commentaire: str, note: 
     avatar_client = str(user.avatar)
     date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    cur.execute("""INSERT OR REPLACE INTO comptes (id_discord, avatar, pseudo) VALUES (?, ?, ?)""",
+    cur.execute('''INSERT OR REPLACE INTO comptes (id_discord, avatar, pseudo) VALUES (?, ?, ?)''',
                 (id_client, pseudo_client, avatar_client))
-    cur.execute("""INSERT INTO avis (id_client, date_publication, pseudo_vendeur, commentaire, note) VALUES (?, ?, ?, ?, ?)""",
+    cur.execute('''INSERT INTO avis (id_client, date_publication, pseudo_vendeur, commentaire, note) VALUES (?, ?, ?, 
+    ?, ?)''',
                 (id_client, date, pseudo_vendeur, commentaire, note))
     con.commit()
 
@@ -87,9 +86,9 @@ def get_client_avis(client: discord.Member):
     '''
     id_client = client.id
 
-    cur.execute("""SELECT avis.pseudo_vendeur, avis.note, avis.commentaire avis.date_publication FROM avis
+    cur.execute('''SELECT avis.pseudo_vendeur, avis.note, avis.commentaire avis.date_publication FROM avis
                 WHERE avis.id_client = ?
-                ORDER BY avis.date_publication DESC""", (id_client, ))
+                ORDER BY avis.date_publication DESC''', (id_client, ))
     return cur.fetchall()
 
 
@@ -101,10 +100,10 @@ def get_vendeur_avis(pseudo_vendeur: str):
     ---
     Renvoie une liste de tuples (pseudo_client, note, commentaire, date de publication)
     '''
-    cur.execute("""SELECT comptes.pseudo, avis.note, avis.commentaire, avis.date_publication FROM avis
+    cur.execute('''SELECT comptes.pseudo, avis.note, avis.commentaire, avis.date_publication FROM avis
                 JOIN comptes ON avis.id_client = comptes.id_discord
                 WHERE avis.pseudo_vendeur = ?
-                ORDER BY avis.note DESC""", (pseudo_vendeur, ))
+                ORDER BY avis.note DESC''', (pseudo_vendeur, ))
     return cur.fetchall()
 
 
@@ -116,8 +115,8 @@ def get_vendeur_moyenne(pseudo_vendeur: str):
     ---
     Renvoie un float
     '''
-    cur.execute("""SELECT AVG(avis.note) FROM avis
-                WHERE avis.pseudo_vendeur = ?""", (pseudo_vendeur, ))
+    cur.execute('''SELECT AVG(avis.note) FROM avis
+                WHERE avis.pseudo_vendeur = ?''', (pseudo_vendeur, ))
     return cur.fetchone()[0]
 
 
@@ -129,8 +128,8 @@ def get_vendeur_nb_avis(pseudo_vendeur: str):
     ---
     Renvoie un int
     '''
-    cur.execute("""SELECT COUNT(avis.note) FROM avis
-                WHERE avis.pseudo_vendeur = ?""", (pseudo_vendeur, ))
+    cur.execute('''SELECT COUNT(avis.note) FROM avis
+                WHERE avis.pseudo_vendeur = ?''', (pseudo_vendeur, ))
     return cur.fetchone()[0]
 
 
