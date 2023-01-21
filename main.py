@@ -323,6 +323,7 @@ async def launchefeedback(interaction: discord.Interaction):
 
 
 async def pts_fidelite(interaction: discord.Interaction, acheteur = None, param = None ,nbre_point = None):
+    pass
 
 
 
