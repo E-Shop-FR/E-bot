@@ -12,18 +12,18 @@ CONFIG_PATH = CONFIG_DIR + "/config.json"
 
 
 def get_token():
-    '''
+    """
     Renvoie le token du bot
-    '''
+    """
     return get("TOKEN")
 
 
 def get(field: str):
-    '''
+    """
     Permet de récupérer une valeur dans le fichier de configuration
     ---
     field: Valeur à récupérer
-    '''
+    """
     if not os.path.exists(CONFIG_PATH):
         # Si le fichier de configuration n'existe pas, on le crée
         os.makedirs(CONFIG_PATH, exist_ok=True)
@@ -51,12 +51,12 @@ def get(field: str):
 
 
 def get_in_dict(data: dict, field: str):
-    '''
+    """
     Permet de récupérer une valeur dans un dictionnaire
     ---
     data: Dictionnaire
     field: Valeur à récupérer
-    '''
+    """
     if field in data:
         return data[field]
     if field.upper() in data:
