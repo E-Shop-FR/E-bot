@@ -45,13 +45,8 @@ def get_all_avis():
     return cur.fetchall()
 
 
-<<<<<<< Updated upstream
-def add_avis(user: discord.Member, pseudo_vendeur: int, commentaire: str, note: int):
-    """
-=======
 def add_avis(user: discord.Member, pseudo_vendeur: str, commentaire: str, note: int):
-    '''
->>>>>>> Stashed changes
+    """
     Ajoute un avis à la base de données
     ---
     member : Le membre qui a posté l'avis
