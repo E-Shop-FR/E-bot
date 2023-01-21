@@ -1,18 +1,17 @@
-"""
+'''
 Classe principale du bot.
-"""
+'''
 # Imports
 import discord
-from discord import app_commands, utils
 import config
 import database as db
 
 
 # Initisalisation du bot
 class AClient(discord.Client):
-    """
+    '''
     Discord client
-    """
+    '''
 
     def __init__(self, intents):
         super().__init__(intents=intents)
@@ -38,14 +37,13 @@ class AClient(discord.Client):
 
 intents = discord.Intents.default()
 client = AClient(intents=intents)
-tree = app_commands.CommandTree(client)
-
+tree = discord.app_commands.CommandTree(client)
 
 # Système de tickets
 class TickerLauncher(discord.ui.View):
-    """
+    '''
     TODO
-    """
+    '''
 
     def __init__(self) -> None:
         super().__init__(timeout=None)
@@ -55,7 +53,7 @@ class TickerLauncher(discord.ui.View):
     async def ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
         channel_name = f"🎫︱ticket-{interaction.user.name}-{interaction.user.discriminator}".lower()
 
-        ticket = utils.get(interaction.guild.channels, name=channel_name)
+        ticket = discord.utils.get(interaction.guild.channels, name=channel_name)
 
         if ticket is not None:
             # Le ticket existe déjà
@@ -90,9 +88,9 @@ class TickerLauncher(discord.ui.View):
 
 # Système de fermeture de tickets
 class ConfirmView(discord.ui.View):
-    """
+    '''
     TODO
-    """
+    '''
 
     def __init__(self) -> None:
         super().__init__(timeout=None)
@@ -108,9 +106,9 @@ class ConfirmView(discord.ui.View):
 
 
 class MainView(discord.ui.View):
-    """
+    '''
     TODO
-    """
+    '''
 
     def __init__(self) -> None:
         super().__init__(timeout=None)
@@ -132,9 +130,9 @@ class MainView(discord.ui.View):
 
 # Système d'archivation de tickets
 class ArchiveConfirm(discord.ui.View):
-    """
+    '''
     TODO
-    """
+    '''
 
     def __init__(self) -> None:
         super().__init__(timeout=None)
@@ -160,9 +158,9 @@ class ArchiveConfirm(discord.ui.View):
 
 # feedback système
 class FeedBack(discord.ui.View):
-    """
+    '''
     TODO
-    """
+    '''
 
     def __init__(self, freelancer=None, channel=None) -> None:
         super().__init__(timeout=None)
@@ -172,86 +170,47 @@ class FeedBack(discord.ui.View):
     # bouton pour lancer le début du feedback
     @discord.ui.button(label="Commente", custom_id="commant_button", style=discord.ButtonStyle.blurple)
     async def feedbacklaunch(self, interaction: discord.Interaction, button: discord.ui.Button):
-<<<<<<< Updated upstream
-        self.tab[0] = str({interaction.user.name} - {interaction.user.discriminator})
-=======
         self.tab[0]= interaction.user
->>>>>>> Stashed changes
         await interaction.response.send_message("écrit maintenant ton commentaire", ephemeral=True)
         self.tab
 
     # Button star
     @discord.ui.button(label="1star", custom_id="1_star", style=discord.ButtonStyle.blurple)
-<<<<<<< Updated upstream
-    async def star_1(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0] = str({interaction.user.name} - {interaction.user.discriminator})
-=======
     async def star_1(self,interaction: discord.Interaction, button: discord.ui.Button):
         self.tab[0]= interaction.user
->>>>>>> Stashed changes
         self.tab[2] = 1
         await interaction.response.send_message("Tu a mis 1 étoile", ephemeral=True)
 
     # Button star
     @discord.ui.button(label="2star", custom_id="2_star", style=discord.ButtonStyle.blurple)
-<<<<<<< Updated upstream
-    async def star_2(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0] = str({interaction.user.name} - {interaction.user.discriminator})
-        self.tab[2] = 2
-=======
     async def star_2(self,interaction: discord.Interaction, button: discord.ui.Button):
         self.tab[0]= interaction.user
         self.tab[2]= 2
->>>>>>> Stashed changes
         await interaction.response.send_message("tu a mis 2 étoile", ephemeral=True)
 
     # Button star
     @discord.ui.button(label="3star", custom_id="3_star", style=discord.ButtonStyle.blurple)
-<<<<<<< Updated upstream
-    async def star_3(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0] = str({interaction.user.name} - {interaction.user.discriminator})
-        self.tab[2] = 3
-=======
     async def star_3(self,interaction: discord.Interaction, button: discord.ui.Button):
         self.tab[0]= interaction.user
         self.tab[2]= 3
->>>>>>> Stashed changes
         await interaction.response.send_message("tu a mis 2 étoile", ephemeral=True)
 
     # Button star
     @discord.ui.button(label="4star", custom_id="4_star", style=discord.ButtonStyle.blurple)
-<<<<<<< Updated upstream
-    async def star_4(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0] = str({interaction.user.name} - {interaction.user.discriminator})
-        self.tab[2] = 4
-=======
     async def star_4(self,interaction: discord.Interaction, button: discord.ui.Button):
         self.tab[0]= interaction.user
         self.tab[2]= 4
->>>>>>> Stashed changes
         await interaction.response.send_message("tu a mis 2 étoile", ephemeral=True)
 
     # Button star
     @discord.ui.button(label="5star", custom_id="5_star", style=discord.ButtonStyle.blurple)
-<<<<<<< Updated upstream
-    async def star_5(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0] = str({interaction.user.name} - {interaction.user.discriminator})
-        self.tab[2] = 5
-=======
     async def star_5(self,interaction: discord.Interaction, button: discord.ui.Button):
         self.tab[0]= interaction.user
         self.tab[2]= 5
->>>>>>> Stashed changes
         await interaction.response.send_message("tu a mis 2 étoile", ephemeral=True)
 
     # Button fini
     @discord.ui.button(label="finish", custom_id="comment_fini", style=discord.ButtonStyle.green)
-<<<<<<< Updated upstream
-    async def finish(self, interaction: discord.Interaction, button: discord.ui.Button):
-        await interaction.response.send_message("voila votre commentaire est fini", ephemeral=True)
-        # demander a mega pour la db
-
-=======
     async def finish(self,interaction: discord.Interaction, button: discord.ui.Button):
         if not None in self.tab:
             db.add_avis(self.tab[0], self.tab[3], self.tab[1], self.tab[2])
@@ -259,22 +218,21 @@ class FeedBack(discord.ui.View):
         else:
             await interaction.response.send_message("attention tu n'a pas mis d'étoile ou tu n'a pas mis un commentaire !",ephemeral=True)
             await interaction.response.defer()
->>>>>>> Stashed changes
 
 # Commandes
 @tree.command(name="ping", description="Pong !", guild=discord.Object(id=1046437841447686226))
 async def ping(interaction: discord.Interaction):
-    """
+    '''
     Renvoie la latence du bot
-    """
+    '''
     await interaction.response.send_message(f"🏓 Pong ! {round(client.latency, 3)} ms!")
 
 
 @tree.command(name="test", description="Test dev", guild=discord.Object(id=1046437841447686226))
 async def test(interaction: discord.Interaction):
-    """
+    '''
     Test dev
-    """
+    '''
     db.add_avis(interaction.user, "Test", "Carré", 5)
     await interaction.response.send_message("Test")
 
@@ -283,9 +241,9 @@ async def test(interaction: discord.Interaction):
 @tree.command(name="clear", description="Retirer des messages d'un channel",
               guild=discord.Object(id=1046437841447686226))
 async def self(ctx, amount: int = None):
-    """
+    '''
     Retire des messages d'un channel
-    """
+    '''
     await ctx.response.defer(ephemeral=True)
     if amount is None:
         await ctx.channel.purge(limit=1000000)
@@ -328,7 +286,7 @@ async def close(interaction: discord.Interaction):
 
 # Commandes
 @tree.command(name="add", guild=discord.Object(id=1046437841447686226), description="Ajoute un utilisateur au ticket")
-@app_commands.describe(user="L'utilisateur à ajouter au ticket")
+@discord.app_commands.describe(user="L'utilisateur à ajouter au ticket")
 async def add(interaction: discord.Interaction, user: discord.Member):
     if "ticket-for-" in interaction.channel.name:
         await interaction.channel.set_permissions(user, view_channel=True, send_messages=True, attach_files=True,
