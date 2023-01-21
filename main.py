@@ -150,8 +150,7 @@ async def test(interaction: discord.Interaction):
     '''
     Test dev
     '''
-    db.add_avis(interaction.user, "Test", "Carré", 5)
-    await interaction.response.send_message("Test")
+    await interaction.response.send_message("Vous avez : " + str(db.get_client_points(interaction.user)) + " points !")
 
 # Commandes
 @tree.command(name="clear", description="Retirer des messages d'un channel", guild=discord.Object(id=1046437841447686226))
