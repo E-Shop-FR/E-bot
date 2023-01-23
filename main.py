@@ -319,21 +319,17 @@ async def launchefeedback(interaction: discord.Interaction):
     await interaction.response.send_message("feedback système launched", ephemeral=True)
 
 # Commandes
-@tree.command(name="point_fidelite", guild=discord.Object(id=1046437841447686226), description="ajoute les point de fidéliter", acheteur = None, param = None ,nbre_point = None)
+@tree.command(name="ptsfidelite", guild=discord.Object(id=1046437841447686226), description="ajoute les point de fidéliter")
 @app_commands.choices(param=[
-    discord.app_commands.Choice(name='reset', value=1),
-    discord.app_commands.Choice(name='add', value=2),
-    discord.app_commands.Choice(name='remove', value=3)
+    discord.app_commands.Choice(name="reset",value=1),
+    discord.app_commands.Choice(name="add",value=1),
+    discord.app_commands.Choice(name="remove",value=1),
 ])
-
-@app_commands.choices(acheteur=[
-    discord.app_commands.Choice(name=discord.Member, value=1),
-])
-async def pts_fidelite(interaction: discord.Interaction, acheteur = None, param = None ,nbre_point = None):
+async def ptsfidelite(interaction: discord.Interaction, acheteur: discord.Member , param: str, nbre_point: int , required=True):
     if param == 'reset':
         db.reset_client_points(acheteur)
 
-    elif param == 'add':
+    elif param == 'ajouter':
         db.add_client_points(acheteur ,nbre_point)
 
     elif param == 'remove':
