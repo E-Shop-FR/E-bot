@@ -329,7 +329,7 @@ async def ptsfidelite(interaction: discord.Interaction, acheteur: discord.Member
     if param == 'reset':
         db.reset_client_points(acheteur)
 
-    elif param == 'ajouter':
+    elif param == 'add':
         db.add_client_points(acheteur ,nbre_point)
 
     elif param == 'remove':
@@ -340,7 +340,7 @@ async def on_member_join(member):
     channel = member.guild.system_channel
     # TODO MEGOUNEEETdf
     embed = discord.Embed(title=f"{member.name}#{member.discriminator}",
-                          description="🇬🇧 Welcome !\n\n🇫🇷 Wesh mon negro !", color=discord.Colour.random())
+                          description="🇬🇧 Welcome !\n\n🇫🇷 Wesh mon n-word !", color=discord.Colour.random())
     embed.set_thumbnail(url=f"{member.display_avatar}")
     await channel.send(embed=embed)
 
