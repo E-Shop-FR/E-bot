@@ -286,3 +286,78 @@ def get_points_ranking():
     cur.execute("""SELECT comptes.pseudo, comptes.points_fidelite FROM comptes
                 ORDER BY comptes.points_fidelite DESC""")
     return cur.fetchall()
+
+def get_user_infos(id_client: int):
+    '''
+    Renvoie les informations d'un client
+    ---
+    id_client: ID discord du client
+    ---
+    Renvoie un tuple (pseudo, avatar, points de fidélité)
+    '''
+    cur.execute("""SELECT comptes.pseudo, comptes.avatar, comptes.points_fidelite FROM comptes
+                WHERE comptes.id_discord = ?""", (id_client, ))
+    return cur.fetchone()
+
+def get_user(pseudo: str):
+    '''
+    Renvoie les informations d'un client
+    ---
+    pseudo: Pseudo du client
+    ---
+    Renvoie un tuple (pseudo, avatar, points de fidélité)
+    '''
+    cur.execute("""SELECT comptes.pseudo, comptes.avatar, comptes.points_fidelite FROM comptes
+                WHERE comptes.pseudo = ?""", (pseudo, ))
+    return cur.fetchone()
+
+def get_user(member: discord.Member):
+    '''
+    Renvoie les informations d'un client
+    ---
+    member: Membre du serveur
+    ---
+    Renvoie un tuple (pseudo, avatar, points de fidélité)
+    '''
+    client_id = member.id
+    cur.execute("""SELECT comptes.pseudo, comptes.avatar, comptes.points_fidelite FROM comptes
+                WHERE comptes.id_discord = ?""", (client_id, ))
+    return cur.fetchone()
+
+def user_exists(id_client: int):
+    '''
+    Vérifie si un client existe
+    ---
+    id_client: ID discord du client
+    ---
+    Renvoie un bool
+    '''
+    cur.execute("""SELECT comptes.id_discord FROM comptes
+                WHERE comptes.id_discord = ?""", (id_client, ))
+    return cur.fetchone() is not None
+
+def user_exists(pseudo: str):
+    '''
+    Vérifie si un client existe
+    ---
+    pseudo: Pseudo du client
+    ---
+    Renvoie un bool
+    '''
+    cur.execute("""SELECT comptes.pseudo FROM comptes
+                WHERE comptes.pseudo = ?""", (pseudo, ))
+    return cur.fetchone() is not None
+
+def user_exists(member: discord.Member):
+    '''
+    Vérifie si un client existe
+    ---
+    member: Membre du serveur
+    ---
+    Renvoie un bool
+    '''
+    client_id = member.id
+    cur.execute("""SELECT comptes.id_discord FROM comptes
+                WHERE comptes.id_discord = ?""", (client_id, ))
+    return cur.fetchone() is not None
+
