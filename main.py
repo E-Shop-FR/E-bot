@@ -3,7 +3,6 @@ Classe principale du bot.
 """
 # Imports
 import discord
-from discord import app_commands, utils
 import config
 import database as db
 
@@ -27,7 +26,7 @@ class AClient(discord.Client):
         if not self.added:
             self.add_view(TickerLauncher())
             self.added = True
-        print(f"Connexion réussie : {self.user}.")
+        print(f"🤖 Connexion réussie : {self.user}.")
 
     async def setup_hook(self) -> None:
         self.add_view(MainView())
@@ -38,7 +37,7 @@ class AClient(discord.Client):
 
 intents = discord.Intents.default()
 client = AClient(intents=intents)
-tree = app_commands.CommandTree(client)
+tree = discord.app_commands.CommandTree(client)
 
 
 # Système de tickets
@@ -55,7 +54,8 @@ class TickerLauncher(discord.ui.View):
     async def ticket(self, interaction: discord.Interaction, button: discord.ui.Button):
         channel_name = f"🎫︱ticket-{interaction.user.name}-{interaction.user.discriminator}".lower()
 
-        ticket = utils.get(interaction.guild.channels, name=channel_name)
+        ticket = discord.utils.get(
+            interaction.guild.channels, name=channel_name)
 
         if ticket is not None:
             # Le ticket existe déjà
@@ -74,7 +74,8 @@ class TickerLauncher(discord.ui.View):
             }
 
             # Création du channel
-            category = discord.utils.get(interaction.guild.categories, id=1059120888064249988)
+            category = discord.utils.get(
+                interaction.guild.categories, id=1059120888064249988)
             channel = await interaction.guild.create_text_channel(
                 name=channel_name, overwrites=overwrites,
                 reason=f"Ticket for {interaction.user}",
@@ -142,7 +143,8 @@ class ArchiveConfirm(discord.ui.View):
     @discord.ui.button(label="Confirm", style=discord.ButtonStyle.red, custom_id="confirm")
     async def confirm_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
-            category = discord.utils.get(interaction.guild.categories, id=1061049218569084948)
+            category = discord.utils.get(
+                interaction.guild.categories, id=1061049218569084948)
             channel = interaction.channel
             if channel.category == category:
                 await interaction.response.send_message(
@@ -169,59 +171,61 @@ class FeedBack(discord.ui.View):
         self.channel = channel
         self.tab = [None, None, None, freelancer]
 
-    # bouton pour lancer le début du feedback
-    @discord.ui.button(label="Commente", custom_id="commant_button", style=discord.ButtonStyle.blurple)
+    # Button star
+    @discord.ui.button(label="⭐️", custom_id="1_star", style=discord.ButtonStyle.blurple)
+    async def star_1(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.tab[0] = interaction.user
+        self.tab[2] = 1
+        await interaction.response.send_message("🇫🇷 Vous avez mis une note de 1 étoile. \n 🇺🇸🇬🇧 You have given a 1 star rating.", ephemeral=True)
+
+    # Button star
+    @discord.ui.button(label="⭐️⭐️", custom_id="2_star", style=discord.ButtonStyle.blurple)
+    async def star_2(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.tab[0] = interaction.user
+        self.tab[2] = 2
+        await interaction.response.send_message("🇫🇷 Vous avez mis une note de 2 étoiles. \n 🇺🇸🇬🇧 You have given a 2 stars rating.", ephemeral=True)
+
+    # Button star
+    @discord.ui.button(label="⭐️⭐️⭐️", custom_id="3_star", style=discord.ButtonStyle.blurple)
+    async def star_3(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.tab[0] = interaction.user
+        self.tab[2] = 3
+        await interaction.response.send_message("🇫🇷 Vous avez mis une note de 3 étoiles. \n 🇺🇸🇬🇧 You have given a 3 stars rating.", ephemeral=True)
+
+    # Button star
+    @discord.ui.button(label="⭐️⭐️⭐️⭐️", custom_id="4_star", style=discord.ButtonStyle.blurple)
+    async def star_4(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.tab[0] = interaction.user
+        self.tab[2] = 4
+        await interaction.response.send_message("🇫🇷 Vous avez mis une note de 4 étoiles. \n 🇺🇸🇬🇧 You have given a 4 stars rating.", ephemeral=True)
+
+    # Button star
+    @discord.ui.button(label="⭐️⭐️⭐️⭐️⭐️", custom_id="5_star", style=discord.ButtonStyle.blurple)
+    async def star_5(self, interaction: discord.Interaction, button: discord.ui.Button):
+        self.tab[0] = interaction.user
+        self.tab[2] = 5
+        await interaction.response.send_message("🇫🇷 Vous avez mis une note de 5 étoiles. \n 🇺🇸🇬🇧 You have given a 5 stars rating.", ephemeral=True)
+
+    # Button commentaire
+    @discord.ui.button(label="Commente", custom_id="comment_button", style=discord.ButtonStyle.blurple)
     async def feedbacklaunch(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0]= interaction.user
+        self.tab[0] = interaction.user
         await interaction.response.send_message("écrit maintenant ton commentaire", ephemeral=True)
         self.tab
 
-    # Button star
-    @discord.ui.button(label="1star", custom_id="1_star", style=discord.ButtonStyle.blurple)
-    async def star_1(self,interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0]= interaction.user
-        self.tab[2] = 1
-        await interaction.response.send_message("Tu a mis 1 étoile", ephemeral=True)
-
-    # Button star
-    @discord.ui.button(label="2star", custom_id="2_star", style=discord.ButtonStyle.blurple)
-    async def star_2(self,interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0]= interaction.user
-        self.tab[2]= 2
-        await interaction.response.send_message("tu a mis 2 étoile", ephemeral=True)
-
-    # Button star
-    @discord.ui.button(label="3star", custom_id="3_star", style=discord.ButtonStyle.blurple)
-    async def star_3(self,interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0]= interaction.user
-        self.tab[2]= 3
-        await interaction.response.send_message("tu a mis 2 étoile", ephemeral=True)
-
-    # Button star
-    @discord.ui.button(label="4star", custom_id="4_star", style=discord.ButtonStyle.blurple)
-    async def star_4(self,interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0]= interaction.user
-        self.tab[2]= 4
-        await interaction.response.send_message("tu a mis 2 étoile", ephemeral=True)
-
-    # Button star
-    @discord.ui.button(label="5star", custom_id="5_star", style=discord.ButtonStyle.blurple)
-    async def star_5(self,interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0]= interaction.user
-        self.tab[2]= 5
-        await interaction.response.send_message("tu a mis 2 étoile", ephemeral=True)
-
-    # Button fini
+    # Button finish
     @discord.ui.button(label="finish", custom_id="comment_fini", style=discord.ButtonStyle.green)
-    async def finish(self,interaction: discord.Interaction, button: discord.ui.Button):
+    async def finish(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not None in self.tab:
             db.add_avis(self.tab[0], self.tab[3], self.tab[1], self.tab[2])
             await interaction.response.send_message("voila votre commentaire est fini", ephemeral=True)
         else:
-            await interaction.response.send_message("attention tu n'a pas mis d'étoile ou tu n'a pas mis un commentaire !",ephemeral=True)
+            await interaction.response.send_message("attention tu n'a pas mis d'étoile ou tu n'a pas mis un commentaire !", ephemeral=True)
             await interaction.response.defer()
 
 # Commandes
+
+
 @tree.command(name="ping", description="Pong !", guild=discord.Object(id=1046437841447686226))
 async def ping(interaction: discord.Interaction):
     """
@@ -270,7 +274,7 @@ async def ticketing(interaction: discord.Interaction):
         title="🇬🇧🇺🇸 If you need support or want to order, click the button below to create a ticket ! \n\n🇫🇷 Si vous avez besoin d'aide ou que vous souhaitez passer commande, clickez sur le bouton ci-dessous pour créer un ticket !",
         color=discord.Colour.blue())
     await interaction.channel.send(embed=embed, view=TickerLauncher())
-    await interaction.response.send_message("Ticketing system launched!", ephemeral=True)
+    await interaction.response.send_message("✅ Système de ticket lancé avec succès !", ephemeral=True)
 
 
 # Commandes
@@ -288,7 +292,7 @@ async def close(interaction: discord.Interaction):
 
 # Commandes
 @tree.command(name="add", guild=discord.Object(id=1046437841447686226), description="Ajoute un utilisateur au ticket")
-@app_commands.describe(user="L'utilisateur à ajouter au ticket")
+@discord.app_commands.describe(user="L'utilisateur à ajouter au ticket")
 async def add(interaction: discord.Interaction, user: discord.Member):
     if "ticket-for-" in interaction.channel.name:
         await interaction.channel.set_permissions(user, view_channel=True, send_messages=True, attach_files=True,
@@ -302,29 +306,23 @@ async def add(interaction: discord.Interaction, user: discord.Member):
 # Commandes
 @tree.command(name="feedback", guild=discord.Object(id=1046437841447686226), description="Lance le système de feedback")
 async def launchefeedback(interaction: discord.Interaction):
-    embed = discord.Embed(title="🇬🇧🇺🇸 anglais ! \n\n🇫🇷 francais  !",
+    embed = discord.Embed(title="🌟 FEEDBACK", description="🇬🇧🇺🇸 To have a honnest feedback on our service, we invite you to add a comment and a rating to E-shop using the buttons below ! This will only take a few minutes. \n\n🇫🇷 Afin d'avoir un retour clair sur notre service, nous vous invitons à ajouter un commentaire et une note à E-shop en utilisant les boutons ci-dessous ! Cela ne prendra que quelques minutes.",
                           color=discord.Colour.blue())
     await interaction.channel.send(embed=embed,
                                    view=FeedBack({interaction.user.name} - {interaction.user.discriminator}))
-    await interaction.response.send_message("feedback système launched", ephemeral=True)
+    await interaction.response.send_message("✅ Système de feedback lancé avec succès !", ephemeral=True)
 
-# Commandes
+''' Commandes
 @tree.command(name="point_fidelite", guild=discord.Object(id=1046437841447686226), description="ajoute les point de fidéliter", acheteur = None, param = None ,nbre_point = None)
-@app_commands.choices(param=[
+@discord.app_commands.choices(param=[
     discord.app_commands.Choice(name='create', value=1),
     discord.app_commands.Choice(name='reset', value=2),
     discord.app_commands.Choice(name='add', value=3),
     discord.app_commands.Choice(name='remove', value=4)
 ])
-
-@app_commands.choices(acheteur=[
-    discord.app_commands.Choice(name=discord.Member, value=1),
+@discord.app_commands.choices(acheteur=[discord.app_commands.Choice(name=discord.Member, value=1),
 ])
-
-
-async def pts_fidelite(interaction: discord.Interaction, acheteur = None, param = None ,nbre_point = None):
-    pass
-
+'''
 
 
 @client.event
