@@ -3,7 +3,6 @@ Ce fichier permet la gestion de la base de données.
 '''
 
 # Imports
-import os
 import sqlite3
 import discord
 import datetime
