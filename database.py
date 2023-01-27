@@ -1,6 +1,6 @@
-"""
+'''
 Ce fichier permet la gestion de la base de données.
-"""
+'''
 
 # Imports
 import sqlite3
@@ -8,9 +8,7 @@ import discord
 import datetime
 
 # Database
-import config
-
-con = sqlite3.connect(config.db_file_path())
+con = sqlite3.connect("resources/database.db")
 cur = con.cursor()
 
 # Création des tables
@@ -32,12 +30,11 @@ cur.execute("""CREATE TABLE IF NOT EXISTS avis(
             )""")
 con.commit()
 
-
 # Méthodes SQL
 def get_all_avis():
-    """
+    '''
     Renvoie les avis de tout le market
-    """
+    '''
     cur.execute('''SELECT comptes.pseudo, avis.pseudo_vendeur, avis.commentaire, avis.note FROM avis
                 JOIN comptes ON avis.id_client = comptes.id_discord
                 ORDER BY avis.note DESC
@@ -46,14 +43,14 @@ def get_all_avis():
 
 
 def add_avis(user: discord.Member, pseudo_vendeur: str, commentaire: str, note: int):
-    """
+    '''
     Ajoute un avis à la base de données
     ---
     member : Le membre qui a posté l'avis
     pseudo_vendeur: Pseudo du vendeur
     commentaire: Commentaire du client
     note: Note du client sur 5
-    """
+    '''
     pseudo_client = user.name
     id_client = user.id
     avatar_client = str(user.avatar)
@@ -68,95 +65,95 @@ def add_avis(user: discord.Member, pseudo_vendeur: str, commentaire: str, note: 
 
 
 def remove_avis(id_avis: int):
-    """
+    '''
     Supprime un avis de la base de données
     ---
     id_avis: ID du commentaire
-    """
+    '''
     cur.execute("""DELETE FROM avis WHERE id_avis = ?""",
                 (id_avis,))
     con.commit()
 
 
 def get_client_avis(client: discord.Member):
-    """
+    '''
     Renvoie les avis d'un client
     ---
     id_client: ID discord du client
     ---
     Renvoie une liste de tuples (pseudo_vendeur, note, commentaire, date de publication)
-    """
+    '''
     id_client = client.id
 
     cur.execute('''SELECT avis.pseudo_vendeur, avis.note, avis.commentaire avis.date_publication FROM avis
                 WHERE avis.id_client = ?
-                ORDER BY avis.date_publication DESC''', (id_client,))
+                ORDER BY avis.date_publication DESC''', (id_client, ))
     return cur.fetchall()
 
 
 def get_vendeur_avis(pseudo_vendeur: str):
-    """
+    '''
     Renvoie les avis sur vendeur
     ---
     pseudo_vendeur: Pseudo du vendeur
     ---
     Renvoie une liste de tuples (pseudo_client, note, commentaire, date de publication)
-    """
+    '''
     cur.execute('''SELECT comptes.pseudo, avis.note, avis.commentaire, avis.date_publication FROM avis
                 JOIN comptes ON avis.id_client = comptes.id_discord
                 WHERE avis.pseudo_vendeur = ?
-                ORDER BY avis.note DESC''', (pseudo_vendeur,))
+                ORDER BY avis.note DESC''', (pseudo_vendeur, ))
     return cur.fetchall()
 
 
 def get_vendeur_moyenne(pseudo_vendeur: str):
-    """
+    '''
     Renvoie la note moyenne d'un vendeur
     ---
     pseudo_vendeur: Pseudo du vendeur
     ---
     Renvoie un float
-    """
+    '''
     cur.execute('''SELECT AVG(avis.note) FROM avis
-                WHERE avis.pseudo_vendeur = ?''', (pseudo_vendeur,))
+                WHERE avis.pseudo_vendeur = ?''', (pseudo_vendeur, ))
     return cur.fetchone()[0]
 
 
 def get_vendeur_nb_avis(pseudo_vendeur: str):
-    """
+    '''
     Renvoie le nombre d'avis d'un vendeur
     ---
     pseudo_vendeur: Pseudo du vendeur
     ---
     Renvoie un int
-    """
+    '''
     cur.execute('''SELECT COUNT(avis.note) FROM avis
-                WHERE avis.pseudo_vendeur = ?''', (pseudo_vendeur,))
+                WHERE avis.pseudo_vendeur = ?''', (pseudo_vendeur, ))
     return cur.fetchone()[0]
 
 
 def get_client_points(client: discord.Member):
-    """
+    '''
     Renvoie les points de fidélité d'un client
     ---
     id_client: ID discord du client
     ---
     Renvoie un int
-    """
+    '''
     id_client = client.id
 
     cur.execute("""SELECT comptes.points_fidelite FROM comptes
-                WHERE comptes.id_discord = ?""", (id_client,))
+                WHERE comptes.id_discord = ?""", (id_client, ))
     return cur.fetchone()[0]
 
 
 def add_client_points(client: discord.Member, points: int):
-    """
+    '''
     Ajoute des points de fidélité à un client
     ---
     id_client: ID discord du client
     points: Nombre de points à ajouter
-    """
+    '''
     id_client = client.id
     name = client.name
     avatar = str(client.avatar)
@@ -167,12 +164,12 @@ def add_client_points(client: discord.Member, points: int):
 
 
 def remove_client_points(client: discord.Member, points: int):
-    """
+    '''
     Retire des points de fidélité à un client
     ---
     id_client: ID discord du client
     points: Nombre de points à retirer
-    """
+    '''
     id_client = client.id
     name = client.name
     avatar = str(client.avatar)
@@ -184,12 +181,12 @@ def remove_client_points(client: discord.Member, points: int):
 
 
 def set_client_points(client: discord.Member, points: int):
-    """
+    '''
     Définit les points de fidélité d'un client
     ---
     id_client: ID discord du client
     points: Nombre de points à définir
-    """
+    '''
     id_client = client.id
     name = client.name
     avatar = str(client.avatar)
@@ -201,10 +198,10 @@ def set_client_points(client: discord.Member, points: int):
 
 
 def reset_client_points(client: discord.Member):
-    """
+    '''
     Réinitialise les points de fidélité d'un client à 0
     id_client: ID discord du client
-    """
+    '''
     id_client = client.id
     name = client.name
     avatar = str(client.avatar)
@@ -216,156 +213,151 @@ def reset_client_points(client: discord.Member):
 
 
 def get_client_pseudo(client: discord.Member):
-    """
+    '''
     Renvoie le pseudo d'un client
     ---
     id_client: ID discord du client
     ---
     Renvoie un str
-    """
+    '''
     id_client = client.id
 
     cur.execute("""SELECT comptes.pseudo FROM comptes
-                WHERE comptes.id_discord = ?""", (id_client,))
+                WHERE comptes.id_discord = ?""", (id_client, ))
     return cur.fetchone()[0]
 
 
 def get_client_avatar(id_client: int):
-    """
+    '''
     Renvoie l'avatar d'un client
     ---
     id_client: ID discord du client
     ---
     Renvoie un str
-    """
+    '''
     cur.execute("""SELECT comptes.avatar FROM comptes
-                WHERE comptes.id_discord = ?""", (id_client,))
+                WHERE comptes.id_discord = ?""", (id_client, ))
     return cur.fetchone()[0]
 
 
 def get_client_id(pseudo: str):
-    """
+    '''
     Renvoie l'ID d'un client
     ---
     pseudo: Pseudo du client
     ---
     Renvoie un int
-    """
+    '''
     cur.execute("""SELECT comptes.id_discord FROM comptes
-                WHERE comptes.pseudo = ?""", (pseudo,))
+                WHERE comptes.pseudo = ?""", (pseudo, ))
     return cur.fetchone()[0]
 
 
 def get_client_informations(id_client: int):
-    """
+    '''
     Renvoie les informations d'un client
     ---
     id_client: ID discord du client
     ---
     Renvoie un tuple (pseudo, avatar, points de fidélité)
-    """
+    '''
     cur.execute("""SELECT comptes.pseudo, comptes.avatar, comptes.points_fidelite FROM comptes
-                WHERE comptes.id_discord = ?""", (id_client,))
+                WHERE comptes.id_discord = ?""", (id_client, ))
     return cur.fetchone()
 
 
 def get_all_clients():
-    """
+    '''
     Renvoie tous les clients
     ---
     Renvoie une liste de tuples (pseudo, avatar, points de fidélité)
-    """
+    '''
     cur.execute(
         """SELECT comptes.pseudo, comptes.avatar, comptes.points_fidelite FROM comptes""")
     return cur.fetchall()
 
 
 def get_points_ranking():
-    """
+    '''
     Renvoie le classement des points de fidélité
     ---
     Renvoie une liste de tuples (pseudo, points de fidélité)
-    """
+    '''
     cur.execute("""SELECT comptes.pseudo, comptes.points_fidelite FROM comptes
                 ORDER BY comptes.points_fidelite DESC""")
     return cur.fetchall()
 
-
 def get_user_infos(id_client: int):
-    """
+    '''
     Renvoie les informations d'un client
     ---
     id_client: ID discord du client
     ---
     Renvoie un tuple (pseudo, avatar, points de fidélité)
-    """
+    '''
     cur.execute("""SELECT comptes.pseudo, comptes.avatar, comptes.points_fidelite FROM comptes
-                WHERE comptes.id_discord = ?""", (id_client,))
+                WHERE comptes.id_discord = ?""", (id_client, ))
     return cur.fetchone()
-
 
 def get_user(pseudo: str):
-    """
+    '''
     Renvoie les informations d'un client
     ---
     pseudo: Pseudo du client
     ---
     Renvoie un tuple (pseudo, avatar, points de fidélité)
-    """
+    '''
     cur.execute("""SELECT comptes.pseudo, comptes.avatar, comptes.points_fidelite FROM comptes
-                WHERE comptes.pseudo = ?""", (pseudo,))
+                WHERE comptes.pseudo = ?""", (pseudo, ))
     return cur.fetchone()
 
-
 def get_user(member: discord.Member):
-    """
+    '''
     Renvoie les informations d'un client
     ---
     member: Membre du serveur
     ---
     Renvoie un tuple (pseudo, avatar, points de fidélité)
-    """
+    '''
     client_id = member.id
     cur.execute("""SELECT comptes.pseudo, comptes.avatar, comptes.points_fidelite FROM comptes
-                WHERE comptes.id_discord = ?""", (client_id,))
+                WHERE comptes.id_discord = ?""", (client_id, ))
     return cur.fetchone()
 
-
 def user_exists(id_client: int):
-    """
+    '''
     Vérifie si un client existe
     ---
     id_client: ID discord du client
     ---
     Renvoie un bool
-    """
+    '''
     cur.execute("""SELECT comptes.id_discord FROM comptes
-                WHERE comptes.id_discord = ?""", (id_client,))
+                WHERE comptes.id_discord = ?""", (id_client, ))
     return cur.fetchone() is not None
 
-
 def user_exists(pseudo: str):
-    """
+    '''
     Vérifie si un client existe
     ---
     pseudo: Pseudo du client
     ---
     Renvoie un bool
-    """
+    '''
     cur.execute("""SELECT comptes.pseudo FROM comptes
-                WHERE comptes.pseudo = ?""", (pseudo,))
+                WHERE comptes.pseudo = ?""", (pseudo, ))
     return cur.fetchone() is not None
 
-
 def user_exists(member: discord.Member):
-    """
+    '''
     Vérifie si un client existe
     ---
     member: Membre du serveur
     ---
     Renvoie un bool
-    """
+    '''
     client_id = member.id
     cur.execute("""SELECT comptes.id_discord FROM comptes
-                WHERE comptes.id_discord = ?""", (client_id,))
+                WHERE comptes.id_discord = ?""", (client_id, ))
     return cur.fetchone() is not None
+
