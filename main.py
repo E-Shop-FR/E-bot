@@ -2,6 +2,8 @@
 Classe principale du bot.
 """
 # Imports
+import asyncio
+
 import discord
 from discord import app_commands, utils, Activity
 
@@ -19,18 +21,20 @@ class AClient(discord.Client):
         super().__init__(intents=intents)
         self.synced = False
         self.added = False
+        self.guild = None
 
     async def on_ready(self):
         await self.wait_until_ready()
         if not self.synced:
-            await tree.sync(guild=discord.Object(id=1046437841447686226))
+            await tree.sync(guild=self.guild)
             self.synced = True
         if not self.added:
             self.add_view(TickerLauncher())
             self.added = True
         print(f"Connexion réussie : {self.user}.")
         await self.wait_until_ready()
-        await self.set_activity_text("Under development...")
+        self.guild = self.get_guild(1046437841447686226)
+        self.loop.create_task(self.status_task())
 
     async def setup_hook(self) -> None:
         self.add_view(MainView())
@@ -39,8 +43,20 @@ class AClient(discord.Client):
         self.add_view(ArchiveConfirm())
 
     async def set_activity_text(self, text: str):
-        activity = discord.Game(name=text)
+        activity = discord.Activity(type=discord.ActivityType.watching, name=text)
         await self.change_presence(status=discord.Status.online, activity=activity)
+
+    async def status_task(self):
+        while True:
+            members_numb = len(self.guild.members)
+            await self.set_activity_text(f"{members_numb} membres")
+            await asyncio.sleep(10)
+            await self.set_activity_text("les commandes de E-shop")
+            await asyncio.sleep(10)
+            await self.set_activity_text(f"{members_numb} members")
+            await asyncio.sleep(10)
+            await self.set_activity_text("E-shop's commands")
+            await asyncio.sleep(10)
 
 
 intents = discord.Intents.default()
@@ -346,7 +362,6 @@ async def ptsfidelite(interaction: discord.Interaction, acheteur: discord.Member
 @client.event
 async def on_member_join(member):
     channel = member.guild.system_channel
-    # TODO MEGOUNEEETdf
     embed = discord.Embed(title=f"{member.name}#{member.discriminator}",
                           description="🇬🇧 Welcome !\n\n🇫🇷 Wesh mon n-word !", color=discord.Colour.random())
     embed.set_thumbnail(url=f"{member.display_avatar}")
@@ -365,6 +380,17 @@ async def on_message(message):
         await message.channel.send("Commentaire enregistré !")
         pending_list.remove(el)
         return
+
+
+async def send_perm_error(ctx: discord.Interaction):
+    channel = ctx.channel
+    embed = discord.Embed(title="Vous n'avez pas les permissions pour effectuer cette commande !",
+                          description="🇬🇧 You do not have the permission to use this command ! "
+                                      "Please contact a staff member if you think that is an error."
+                                      "\n\n🇫🇷 Vous n'avez pas les permissions pour effectuer cette commande ! "
+                                      "Veuillez contacter le staff si vous pensez que c'est une erreur.", color=discord.Colour.red())
+
+    await channel.send(embed=embed)
 
 
 if __name__ == '__main__':
