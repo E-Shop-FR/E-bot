@@ -3,7 +3,7 @@ Classe principale du bot.
 """
 # Imports
 import discord
-from discord import app_commands, utils, Activity
+from discord import app_commands, utils
 
 import config
 import database as db
@@ -29,18 +29,12 @@ class AClient(discord.Client):
             self.add_view(TickerLauncher())
             self.added = True
         print(f"Connexion réussie : {self.user}.")
-        await self.wait_until_ready()
-        await self.set_activity_text("Under development...")
 
     async def setup_hook(self) -> None:
         self.add_view(MainView())
         self.add_view(TickerLauncher())
         self.add_view(ConfirmView())
         self.add_view(ArchiveConfirm())
-
-    async def set_activity_text(self, text: str):
-        activity = discord.Game(name=text)
-        await self.change_presence(status=discord.Status.online, activity=activity)
 
 
 intents = discord.Intents.default()
@@ -324,24 +318,22 @@ async def launchefeedback(interaction: discord.Interaction):
                                    view=FeedBack(f"{interaction.user.name} - {interaction.user.discriminator}"))
     await interaction.response.send_message("feedback système launched", ephemeral=True)
 
-
 # Commandes
 @tree.command(name="ptsfidelite", guild=discord.Object(id=1046437841447686226), description="fidelise le client")
 @app_commands.choices(param=[
-    discord.app_commands.Choice(name="reset", value='reset'),
-    discord.app_commands.Choice(name="ajouter", value='add'),
-    discord.app_commands.Choice(name="retirer", value='remove'),
+    discord.app_commands.Choice(name="reset",value='reset'),
+    discord.app_commands.Choice(name="ajouter",value='add'),
+    discord.app_commands.Choice(name="retirer",value='remove'),
 ])
-async def ptsfidelite(interaction: discord.Interaction, acheteur: discord.Member, param: str, nbre_point: int):
+async def ptsfidelite(interaction: discord.Interaction, acheteur: discord.Member , param: str, nbre_point: int ):
     if param == 'reset':
         db.reset_client_points(acheteur)
 
     elif param == 'add':
-        db.add_client_points(acheteur, nbre_point)
+        db.add_client_points(acheteur ,nbre_point)
 
     elif param == 'remove':
-        db.remove_client_points(acheteur, nbre_point)
-
+        db.remove_client_points(acheteur ,nbre_point)
 
 @client.event
 async def on_member_join(member):
@@ -365,7 +357,6 @@ async def on_message(message):
         await message.channel.send("Commentaire enregistré !")
         pending_list.remove(el)
         return
-
 
 if __name__ == '__main__':
     token = config.get_token()
