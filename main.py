@@ -46,7 +46,7 @@ feedback_listen = dict()
 # Système de tickets
 class TickerLauncher(discord.ui.View):
     """
-    TODO
+    c'est un objet contenant 1 bouton avec l'évenement création ticket
     """
 
     def __init__(self) -> None:
@@ -102,7 +102,7 @@ class TickerLauncher(discord.ui.View):
 # Système de fermeture de tickets
 class ConfirmView(discord.ui.View):
     """
-    TODO
+    objet permetant de confirmer la fermeture du ticket , il comporte 1 bouton
     """
 
     def __init__(self) -> None:
@@ -129,7 +129,7 @@ class ConfirmView(discord.ui.View):
 
 class MainView(discord.ui.View):
     """
-    TODO
+    objet principal qui gère le ticket une fois ouvert il comporte 3 bouton
     """
 
     def __init__(self) -> None:
@@ -149,7 +149,7 @@ class MainView(discord.ui.View):
 # Système d'archivation de tickets
 class ArchiveConfirm(discord.ui.View):
     """
-    TODO
+    sert a confirmer l'archivation , cet objet comporte 1 bouton
     """
 
     def __init__(self) -> None:
@@ -186,7 +186,7 @@ class ArchiveConfirm(discord.ui.View):
 # feedback système
 class FeedBack(discord.ui.View):
     """
-    TODO
+    gère le système de feedback , cet objet comporte 6 bouton
     """
 
     def __init__(self, freelancer=None) -> None:
