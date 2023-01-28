@@ -76,6 +76,13 @@ class TickerLauncher(discord.ui.View):
                                                                   read_message_history=True)
             }
 
+            # Log ouverture ticket
+            channelLog = client.get_channel(1068629560209440780)
+
+            embed = discord.Embed(title="un ticket vien de se crée ",
+                                 description=f" c'est le ticket de {interaction.user} ", color=discord.Colour.green())
+            await channelLog.send(embed=embed)
+
             # Création du channel
             category = discord.utils.get(
                 interaction.guild.categories, id=1059120888064249988)
@@ -104,6 +111,15 @@ class ConfirmView(discord.ui.View):
     @discord.ui.button(label="Confirm", style=discord.ButtonStyle.red, custom_id="confirm")
     async def confirm_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
+            # Log fermeture ticket
+            channelLog = client.get_channel(1068629560209440780)
+
+            embed = discord.Embed(title="un ticket vien de se fermer ",
+                                 description=f" c'est le ticket de {interaction.user} ", color=discord.Colour.red())
+            await channelLog.send(embed=embed)
+
+
+            # delet channel
             await interaction.channel.delete()
         except:
             await interaction.response.send_message(
@@ -153,6 +169,14 @@ class ArchiveConfirm(discord.ui.View):
 
             await channel.edit(category=category, name=channel.name + "-archived")
             await interaction.response.defer()
+            
+            # Log archive ticket
+            channelLog = client.get_channel(1068629560209440780)
+
+            embed = discord.Embed(title="un ticket vien de s'archiver ",
+                                 description=f" archiver par  {interaction.user} ", color=discord.Colour.blue())
+            await channelLog.send(embed=embed)
+        
         except:
             await interaction.response.send_message(
                 "🇫🇷 Impossible de déplacer le channel. Merci de vérifier que je possède la permission MANAGE_CHANNELS.\n\n🇬🇧🇺🇸 I can't archive this channel. Please check that i have the MANAGE_CHANNELS permission.",
