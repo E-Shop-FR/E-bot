@@ -132,7 +132,50 @@ class ConfirmView(discord.ui.View):
     async def confirm_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user.guild_permissions.manage_channels is False:
             await interaction.response.send_message(
-                f"🇫🇷 Vous n'avez pas la permission de fermer ce ticket!\n\n🇬🇧🇺🇸 You don't have permission to close this ticket!",
+                f"🇫🇷 Vous n'avez pas la permission de delet ce ticket!\n\n🇬🇧🇺🇸 You don't have permission to delet this ticket!",
+                ephemeral=True)
+            return
+        try:
+            # Log delet ticket
+            channelLog = client.get_channel(1068629560209440780)
+            # Fetch des users ayant parlé dans le channel
+            users = [message.author.mention async for message in interaction.channel.history(limit=200)]
+            users = list(set(users))  # Suppression des doublons
+            users = ", ".join(users)  # Conversion en string
+
+            # Date conversion et formatage
+            date = interaction.created_at
+            date = date.astimezone(tz=timezone('Europe/Paris'))
+            date = date.strftime("%d/%m/%Y à %H:%M:%S")
+
+            embed = discord.Embed(title="🎫 TICKET suprimer",
+                                  description=f"""**Nom du channel :** {interaction.channel.name}
+                                    \n**Fermé par :** {interaction.user.mention}
+                                    \n **Utilisateurs ayant parlé dans le ticket :** {users}
+                                    \n**Date de supression :** {date}""", color=discord.Colour.red())
+            await channelLog.send(embed=embed)
+
+            # delet channel
+            await interaction.channel.delete()
+        except:
+            await interaction.response.send_message(
+                "🇫🇷 Impossible de supprimer le channel. Merci de vérifier que je possède la permission MANAGE_CHANNELS.\n\n🇬🇧🇺🇸 I can't delete this channel. Please check that i have the MANAGE_CHANNELS permission.",
+                ephemeral=True)
+
+
+class ConfirmClose(discord.ui.View):
+    """
+    Objet contenant 1 bouton avec l'évenement confirmation fermeture ticket
+    """
+
+    def __init__(self) -> None:
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Confirm", style=discord.ButtonStyle.red, custom_id="confirm")
+    async def confirm_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user.guild_permissions.manage_channels is False:
+            await interaction.response.send_message(
+                f"🇫🇷 Vous n'avez pas la permission de fermer ce ticket!\n\n🇬🇧🇺🇸 You don't have permission to fermer this ticket!",
                 ephemeral=True)
             return
         try:
@@ -148,19 +191,28 @@ class ConfirmView(discord.ui.View):
             date = date.astimezone(tz=timezone('Europe/Paris'))
             date = date.strftime("%d/%m/%Y à %H:%M:%S")
 
-            embed = discord.Embed(title="🎫 TICKET FERME",
+            embed = discord.Embed(title="🎫 TICKET Finie",
                                   description=f"""**Nom du channel :** {interaction.channel.name}
                                     \n**Fermé par :** {interaction.user.mention}
                                     \n **Utilisateurs ayant parlé dans le ticket :** {users}
-                                    \n**Date de fermeture :** {date}""", color=discord.Colour.red())
+                                    \n**Date de finition :** {date}""", color=discord.Colour.red())
             await channelLog.send(embed=embed)
 
-            # delet channel
-            await interaction.channel.delete()
+            # kick du joueur channel
+            
+            if "ticket-for-" in interaction.channel.name:
+                await interaction.channel.set_permissions(user, view_channel=True, send_messages=True, attach_files=True,
+                                                        embed_links=True)
+
+            else:
+                await interaction.response.send_message(
+                    "🇬🇧🇺🇸 This channel isn't a ticket !\n\n🇫🇷 Ce channel n'est pas un ticket !", ephemeral=True)
+
         except:
             await interaction.response.send_message(
-                "🇫🇷 Impossible de supprimer le channel. Merci de vérifier que je possède la permission MANAGE_CHANNELS.\n\n🇬🇧🇺🇸 I can't delete this channel. Please check that i have the MANAGE_CHANNELS permission.",
+                "🇫🇷 Impossible de kick le joueur.",
                 ephemeral=True)
+
 
 
 class MainView(discord.ui.View):
@@ -171,9 +223,16 @@ class MainView(discord.ui.View):
     def __init__(self) -> None:
         super().__init__(timeout=None)
 
+    # bouton qui suprime le ticket
     @discord.ui.button(label="Close", custom_id="ticket_button_close", style=discord.ButtonStyle.red)
     async def close(self, interaction: discord.Interaction, button: discord.ui.Button):
         msg = "🇫🇷 Voulez-vous vraiment fermer ce ticket ?\n\n🇬🇧🇺🇸 Are you sure you want to close this ticket ?"
+        await interaction.response.send_message(msg, view=ConfirmClose(), ephemeral=True)
+
+    # bouton qui kick le client du ticket
+    @discord.ui.button(label="delet", custom_id="ticket_button_delet", style=discord.ButtonStyle.red)
+    async def close(self, interaction: discord.Interaction, button: discord.ui.Button):
+        msg = "🇫🇷 Voulez-vous vraiment suprimer ce ticket ?\n\n🇬🇧🇺🇸 Are you sure you want to delet this ticket ?"
         await interaction.response.send_message(msg, view=ConfirmView(), ephemeral=True)
 
     @discord.ui.button(label="Archive", custom_id="ticket_archive", style=discord.ButtonStyle.blurple)
@@ -301,8 +360,7 @@ class FeedBack(discord.ui.View):
             db.add_avis(self.tab[0], self.tab[3], self.tab[1], self.tab[2])
 
             # Embed
-            feedBackChannel = client.get_channel(
-                1059124591852793916)  # TODO : Mettre le bon id
+            feedBackChannel = client.get_channel(1059124591852793916)
             embed = discord.Embed(title="📝 FEEDBACK",
                                   description=f"""
             **Client :** {interaction.user.mention}
@@ -393,7 +451,7 @@ async def close(interaction: discord.Interaction):
             "🇬🇧🇺🇸 This channel isn't a ticket !\n\n🇫🇷Ce channel n'est pas un ticket !", ephemeral=True)
 
 
-@tree.command(name="add", guild=discord.Object(id=1046437841447686226), description="Ajoute un utilisateur au ticket")
+@tree.command(name="ticketed", guild=discord.Object(id=1046437841447686226), description="Ajoute un utilisateur au ticket")
 @discord.app_commands.describe(user="L'utilisateur à ajouter au ticket")
 async def add(interaction: discord.Interaction, user: discord.Member):
     """
