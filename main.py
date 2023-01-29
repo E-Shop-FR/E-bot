@@ -35,10 +35,10 @@ class AClient(discord.Client):
         self.add_view(ArchiveConfirm())
 
 
-intents = discord.Intents.default()
-intents.members = True
-intents.message_content = True
-client = AClient(intents=intents)
+client_intents = discord.Intents.default()
+client_intents.members = True
+client_intents.message_content = True
+client = AClient(intents=client_intents)
 tree = discord.app_commands.CommandTree(client)
 feedback_listen = dict()
 
@@ -63,7 +63,8 @@ class TickerLauncher(discord.ui.View):
         if ticket is not None:
             # Le ticket existe déjà
             await interaction.response.send_message(
-                f"🇫🇷 Vous avez déjà un ticket ouvert à {ticket.mention}!\n\n🇬🇧🇺🇸 You already have a ticket open at {ticket.mention}!",
+                f"🇫🇷 Vous avez déjà un ticket ouvert à {ticket.mention}!\n\n"
+                f"🇬🇧🇺🇸 You already have a ticket open at {ticket.mention}!",
                 ephemeral=True)
         else:
             # Création du ticket
@@ -80,7 +81,7 @@ class TickerLauncher(discord.ui.View):
             channelLog = client.get_channel(1068629560209440780)
 
             embed = discord.Embed(title="un ticket vien de se crée ",
-                                 description=f" c'est le ticket de {interaction.user} ", color=discord.Colour.green())
+                                  description=f" c'est le ticket de {interaction.user} ", color=discord.Colour.green())
             await channelLog.send(embed=embed)
 
             # Création du channel
@@ -92,10 +93,14 @@ class TickerLauncher(discord.ui.View):
                 category=category)
 
             await channel.send(
-                f"**Hey <@&1046437980333670510> !**\n🇫🇷{interaction.user.mention} viens de créer un ticket ! Merci de nous donner le plus de détails possibles sur votre demande.\n\n🇬🇧🇺🇸 {interaction.user.mention} created a ticket ! Please give as much detail as possible about your request.",
+                f"**Hey <@&1046437980333670510> !**\n🇫🇷{interaction.user.mention} viens de créer un ticket ! "
+                f"Merci de nous donner le plus de détails possibles sur votre demande.\n\n"
+                f"🇬🇧🇺🇸 {interaction.user.mention} created a ticket ! "
+                f"Please give as much detail as possible about your request.",
                 view=MainView())
             await interaction.response.send_message(
-                f"🇫🇷 J'ai ouvert un ticket pour vous ici {channel.mention}!\n\n🇬🇧🇺🇸 I've opened a ticket for you at {channel.mention}!",
+                f"🇫🇷 J'ai ouvert un ticket pour vous ici {channel.mention}!\n\n"
+                f"🇬🇧🇺🇸 I've opened a ticket for you at {channel.mention}!",
                 ephemeral=True)
 
 
@@ -115,15 +120,16 @@ class ConfirmView(discord.ui.View):
             channelLog = client.get_channel(1068629560209440780)
 
             embed = discord.Embed(title="un ticket vien de se fermer ",
-                                 description=f" c'est le ticket de {interaction.user} ", color=discord.Colour.red())
+                                  description=f" c'est le ticket de {interaction.user} ", color=discord.Colour.red())
             await channelLog.send(embed=embed)
-
 
             # delet channel
             await interaction.channel.delete()
         except:
             await interaction.response.send_message(
-                "🇫🇷 Impossible de supprimer le channel. Merci de vérifier que je possède la permission MANAGE_CHANNELS.\n\n\n🇬🇧🇺🇸 I can't delete this channel. Please check that i have the MANAGE_CHANNELS permission.",
+                "🇫🇷 Impossible de supprimer le channel. "
+                "Merci de vérifier que je possède la permission MANAGE_CHANNELS.\n\n\n"
+                "🇬🇧🇺🇸 I cannot delete this channel. Please check that i have the MANAGE_CHANNELS permission.",
                 ephemeral=True)
 
 
@@ -142,7 +148,7 @@ class MainView(discord.ui.View):
 
     @discord.ui.button(label="Archive", custom_id="ticket_archive", style=discord.ButtonStyle.blurple)
     async def archive(self, interaction: discord.Interaction, button: discord.ui.Button):
-        msg="🇫🇷 Voulez-vous vraiment archiver ce ticket ?\n\n🇬🇧🇺🇸 Are you sure you want to archive this ticket ?"
+        msg = "🇫🇷 Voulez-vous vraiment archiver ce ticket ?\n\n🇬🇧🇺🇸 Are you sure you want to archive this ticket ?"
         await interaction.response.send_message(msg, view=ArchiveConfirm(), ephemeral=True)
 
 
@@ -163,23 +169,26 @@ class ArchiveConfirm(discord.ui.View):
             channel = interaction.channel
             if channel.category == category:
                 await interaction.response.send_message(
-                    "🇫🇷 Vous ne pouvez-pas archiver un ticket déjà archivé !\n\n🇬🇧🇺🇸 You cannot archive a ticket twice !",
+                    "🇫🇷 Vous ne pouvez-pas archiver un ticket déjà archivé !\n\n"
+                    "🇬🇧🇺🇸 You cannot archive a ticket twice !",
                     ephemeral=True)
                 return
 
             await channel.edit(category=category, name=channel.name + "-archived")
             await interaction.response.defer()
-            
+
             # Log archive ticket
             channelLog = client.get_channel(1068629560209440780)
 
             embed = discord.Embed(title="un ticket vien de s'archiver ",
-                                 description=f" archiver par  {interaction.user} ", color=discord.Colour.blue())
+                                  description=f" archiver par  {interaction.user} ", color=discord.Colour.blue())
             await channelLog.send(embed=embed)
-        
+
         except:
             await interaction.response.send_message(
-                "🇫🇷 Impossible de déplacer le channel. Merci de vérifier que je possède la permission MANAGE_CHANNELS.\n\n🇬🇧🇺🇸 I can't archive this channel. Please check that i have the MANAGE_CHANNELS permission.",
+                "🇫🇷 Impossible de déplacer le channel. "
+                "Merci de vérifier que je possède la permission MANAGE_CHANNELS.\n\n"
+                "🇬🇧🇺🇸 I can't archive this channel. Please check that i have the MANAGE_CHANNELS permission.",
                 ephemeral=True)
 
 
@@ -189,51 +198,73 @@ class FeedBack(discord.ui.View):
     gère le système de feedback , cet objet comporte 6 bouton
     """
 
-    def __init__(self, freelancer=None) -> None:
+    def __init__(self, feedbacker: discord.Member, freelancer: discord.Member):
         super().__init__(timeout=None)
-        self.tab = [None, None, None, freelancer]
+        self.feedbacker = feedbacker
+        self.commentary = None
+        self.star_numb = None
+        self.freelancer = freelancer
 
         # Button star
+
     @discord.ui.button(label="⭐️", custom_id="1_star", style=discord.ButtonStyle.blurple)
     async def star_1(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0] = interaction.user
-        self.tab[2] = 1
-        await interaction.response.send_message("🇫🇷 Vous avez mis une note de 1 étoile. \n\n🇬🇧🇺🇸 You have given a 1 star rating.", ephemeral=True)
+        if interaction.user != self.feedbacker:
+            await interaction.response.defer()
+            return
+        self.star_numb = 1
+        await interaction.response.send_message(
+            "🇫🇷 Vous avez mis une note de 1 étoile. \n\n🇬🇧🇺🇸 You have given a 1 star rating.", ephemeral=True)
 
     # Button star
     @discord.ui.button(label="⭐️⭐️", custom_id="2_star", style=discord.ButtonStyle.blurple)
     async def star_2(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0] = interaction.user
-        self.tab[2] = 2
-        await interaction.response.send_message("🇫🇷 Vous avez mis une note de 2 étoiles. \n\n🇬🇧🇺🇸 You have given a 2 stars rating.", ephemeral=True)
+        if interaction.user != self.feedbacker:
+            await interaction.response.defer()
+            return
+        self.star_numb = 2
+        await interaction.response.send_message(
+            "🇫🇷 Vous avez mis une note de 2 étoiles. \n\n🇬🇧🇺🇸 You have given a 2 stars rating.", ephemeral=True)
 
     # Button star
     @discord.ui.button(label="⭐️⭐️⭐️", custom_id="3_star", style=discord.ButtonStyle.blurple)
     async def star_3(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0] = interaction.user
-        self.tab[2] = 3
-        await interaction.response.send_message("🇫🇷 Vous avez mis une note de 3 étoiles. \n\n🇬🇧🇺🇸 You have given a 3 stars rating." , ephemeral=True)
+        if interaction.user != self.feedbacker:
+            await interaction.response.defer()
+            return
+        self.star_numb = 3
+        await interaction.response.send_message(
+            "🇫🇷 Vous avez mis une note de 3 étoiles. \n\n🇬🇧🇺🇸 You have given a 3 stars rating.", ephemeral=True)
 
     # Button star
     @discord.ui.button(label="⭐️⭐️⭐️⭐️", custom_id="4_star", style=discord.ButtonStyle.blurple)
     async def star_4(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0] = interaction.user
-        self.tab[2] = 4
-        await interaction.response.send_message("🇫🇷 Vous avez mis une note de 4 étoiles. \n\n🇬🇧🇺🇸 You have given a 4 stars rating.", ephemeral=True)
+        if interaction.user != self.feedbacker:
+            await interaction.response.defer()
+            return
+        self.star_numb = 4
+        await interaction.response.send_message(
+            "🇫🇷 Vous avez mis une note de 4 étoiles. \n\n🇬🇧🇺🇸 You have given a 4 stars rating.", ephemeral=True)
 
     # Button star
     @discord.ui.button(label="⭐️⭐️⭐️⭐️⭐️", custom_id="5_star", style=discord.ButtonStyle.blurple)
     async def star_5(self, interaction: discord.Interaction, button: discord.ui.Button):
-        self.tab[0] = interaction.user
-        self.tab[2] = 5
-        await interaction.response.send_message("🇫🇷 Vous avez mis une note de 5 étoiles. \n\n🇬🇧🇺🇸 You have given a 5 stars rating.", ephemeral=True)
+        if interaction.user != self.feedbacker:
+            await interaction.response.defer()
+            return
+        self.star_numb = 5
+        await interaction.response.send_message(
+            "🇫🇷 Vous avez mis une note de 5 étoiles. \n\n🇬🇧🇺🇸 You have given a 5 stars rating.", ephemeral=True)
 
     # Button commentaire
     @discord.ui.button(label="💬", custom_id="comment_button", style=discord.ButtonStyle.blurple)
     async def feedbacklaunch(self, interaction: discord.Interaction, button: discord.ui.Button):
         global feedback_listen
-        self.tab[0] = interaction.user
-        await interaction.response.send_message("🇫🇷 Veuillez écrire votre commentaire. \n\n🇬🇧🇺🇸 Please write your comment.")
+        if interaction.user != self.feedbacker:
+            await interaction.response.defer()
+            return
+        await interaction.response.send_message(
+            "🇫🇷 Veuillez écrire votre commentaire. \n\n🇬🇧🇺🇸 Please write your comment.")
         pl = []
         if interaction.channel in feedback_listen:
             pl = feedback_listen[interaction.channel]
@@ -243,12 +274,24 @@ class FeedBack(discord.ui.View):
     # Button fini
     @discord.ui.button(label="✅", custom_id="comment_fini", style=discord.ButtonStyle.green)
     async def finish(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if not None in self.tab:
-            db.add_avis(self.tab[0], self.tab[3], self.tab[1], self.tab[2])
-            await interaction.response.send_message("🇫🇷 **Merci pour votre retour !** 💖 \n\n🇬🇧🇺🇸 **Thank you for your feedback !** 💖")
+        if None not in (self.commentary, self.star_numb):
+            db.add_avis(self.feedbacker, self.freelancer.name, self.commentary, self.star_numb)
+            if self.star_numb in (1, 2):
+                await interaction.response.send_message(
+                    "🇫🇷 Commentaire enregistré avec succès. "
+                    "Nous sommes désolés de votre déception face à notre service. "
+                    "Votre commentaire sera pris en compte afin que cela n'arrive plus. \n\n"
+                    "🇬🇧🇺🇸 Feedback successfully saved."
+                    "We are sorry for your disappointment with our service. "
+                    "Your comment will be taken into account so that this does not happen again.")
+            else:
+                await interaction.response.send_message(
+                    "🇫🇷 **Merci pour votre retour !** 💖 \n\n🇬🇧🇺🇸 **Thank you for your feedback !** 💖")
         else:
             await interaction.response.send_message(
-                "🇫🇷 Vous n'avez pas donné de note ou de commentaire. \n\n🇬🇧🇺🇸 You have not given a rating or a comment.", ephemeral=True)
+                "🇫🇷 Vous n'avez pas donné de note ou de commentaire. \n\n"
+                "🇬🇧🇺🇸 You have not given a rating or a comment.",
+                ephemeral=True)
             # await interaction.response.defer()
 
 
@@ -268,7 +311,14 @@ async def test(interaction: discord.Interaction):
     """
     member = interaction.user
     embed = discord.Embed(title="👋 WELCOME !",
-                          description=f"🇫🇷 Bienvenue <@{member.id}> ! Nous espérons que tu trouvera ton bonheur dans nos services.\nPour tout comprendre sur notr système de commande, rendez-vous ici : <#1061021846146912347>. \n\n🇬🇧🇺🇸 Welcome <@{member.id}> ! We hope you will find your happiness in our services.\nTo understand our order system, go here : <#1061021846146912347>.", color=discord.Colour.blue())
+                          description=f"🇫🇷 Bienvenue <@{member.id}> ! "
+                                      f"Nous espérons que tu trouvera ton bonheur dans nos services.\n"
+                                      f"Pour tout comprendre sur notr système de commande, "
+                                      f"rendez-vous ici : <#1061021846146912347>. \n\n"
+                                      f"🇬🇧🇺🇸 Welcome <@{member.id}> ! "
+                                      f"We hope you will find your happiness in our services.\n"
+                                      f"To understand our order system, go here : <#1061021846146912347>.",
+                          color=discord.Colour.blue())
     embed.set_thumbnail(url=f"{member.display_avatar}")
     await interaction.response.send_message(embed=embed)
 
@@ -288,7 +338,8 @@ async def self(ctx, amount: int = None):
             int(amount)
         except Exception:  # Error handler
             await ctx.send(
-                '🇫🇷 Veuillez entrer un nombre entier valide comme montant.\n\n🇬🇧🇺🇸 Please enter a valid integer as amount.',
+                '🇫🇷 Veuillez entrer un nombre entier valide comme montant.\n\n'
+                '🇬🇧🇺🇸 Please enter a valid integer as amount.',
                 ephemeral=True)
         else:
             await ctx.followup.send(f'🇫🇷 {amount} messages supprimés.\n\n🇬🇧🇺🇸 {amount} messages deleted.',
@@ -301,17 +352,19 @@ async def self(ctx, amount: int = None):
               description="Lance le système de ticket en affichant le message avec la réaction")
 async def ticketing(interaction: discord.Interaction):
     embed = discord.Embed(
-        title="🇬🇧🇺🇸 If you need support or want to order, click the button below to create a ticket ! \n\n🇫🇷 Si vous avez besoin d'aide ou que vous souhaitez passer commande, clickez sur le bouton ci-dessous pour créer un ticket !",
+        title="🇬🇧🇺🇸 If you need support or want to order, click the button below to create a ticket ! \n\n"
+              "🇫🇷 Si vous avez besoin d'aide ou que vous souhaitez passer commande, "
+              "clickez sur le bouton ci-dessous pour créer un ticket !",
         color=discord.Colour.blue())
     await interaction.channel.send(embed=embed, view=TickerLauncher())
     await interaction.response.send_message("✅ Système de ticket lancé avec succès !", ephemeral=True)
 
 
 # Commandes
-@tree.command(name="ticket close", guild=discord.Object(id=1046437841447686226), description="Ferme le ticket")
+@tree.command(name="ticketclose", guild=discord.Object(id=1046437841447686226), description="Ferme le ticket")
 async def close(interaction: discord.Interaction):
     if "ticket-for-" in interaction.channel.name:
-        msg="🇬🇧🇺🇸 Are you sure you want to close this ticket ?\n\n🇫🇷Voulez-vous vraiment fermer ce ticket ?"
+        msg = "🇬🇧🇺🇸 Are you sure you want to close this ticket ?\n\n🇫🇷Voulez-vous vraiment fermer ce ticket ?"
         await interaction.response.send_message(msg, view=ConfirmView(), ephemeral=True)
     else:
         await interaction.response.send_message(
@@ -319,7 +372,8 @@ async def close(interaction: discord.Interaction):
 
 
 # Commandes
-@tree.command(name="ticket add", guild=discord.Object(id=1046437841447686226), description="Ajoute un utilisateur au ticket")
+@tree.command(name="ticketadd", guild=discord.Object(id=1046437841447686226),
+              description="Ajoute un utilisateur au ticket")
 @discord.app_commands.describe(user="L'utilisateur à ajouter au ticket")
 async def add(interaction: discord.Interaction, user: discord.Member):
     if "ticket-for-" in interaction.channel.name:
@@ -333,12 +387,21 @@ async def add(interaction: discord.Interaction, user: discord.Member):
 
 # Commandes
 @tree.command(name="feedback", guild=discord.Object(id=1046437841447686226), description="Lance le système de feedback")
-async def launchefeedback(interaction: discord.Interaction):
-    embed = discord.Embed(title="🌟 FEEDBACK", description="🇫🇷 Afin d'avoir un retour clair sur notre service, nous vous invitons à ajouter un commentaire et une note à E-shop en utilisant les boutons ci-dessous ! Cela ne prendra que quelques minutes.\n\n🇬🇧🇺🇸 To have a honnest feedback on our service, we invite you to add a comment and a rating to E-shop using the buttons below ! This will only take a few minutes.",
+@discord.app_commands.describe(freelancer="Freelancer concerné")
+async def launch_feedback(interaction: discord.Interaction, freelancer: discord.Member):
+    embed = discord.Embed(title="🌟 FEEDBACK",
+                          description="🇫🇷 Afin d'avoir un retour clair sur notre service, "
+                                      "nous vous invitons à ajouter un commentaire et une note à E-shop "
+                                      "en utilisant les boutons ci-dessous ! "
+                                      "Cela ne prendra que quelques minutes.\n\n"
+                                      "🇬🇧🇺🇸 To have a honnest feedback on our service, "
+                                      "we invite you to add a comment and a rating to E-shop using the buttons below ! "
+                                      "This will only take a few minutes.",
                           color=discord.Colour.blue())
     await interaction.channel.send(embed=embed,
-                                   view=FeedBack(f"{interaction.user.name} - {interaction.user.discriminator}"))
+                                   view=FeedBack(feedbacker=interaction.user, freelancer=freelancer))
     await interaction.response.send_message("✅ Système de feedback lancé avec succès !", ephemeral=True)
+
 
 # Commandes
 
@@ -349,7 +412,7 @@ async def launchefeedback(interaction: discord.Interaction):
     discord.app_commands.Choice(name="ajouter", value='add'),
     discord.app_commands.Choice(name="retirer", value='remove'),
 ])
-async def ptsfidelite(interaction: discord.Interaction, acheteur: discord.Member, param: str, nbre_point: int):
+async def fidelity_points(acheteur: discord.Member, param: str, nbre_point: int):
     if param == 'reset':
         db.reset_client_points(acheteur)
 
@@ -364,7 +427,14 @@ async def ptsfidelite(interaction: discord.Interaction, acheteur: discord.Member
 async def on_member_join(member):
     channel = member.guild.system_channel
     embed = discord.Embed(title="👋 WELCOME !",
-                          description=f"🇫🇷 Bienvenue <@{member.id}> ! Nous espérons que tu trouvera ton bonheur dans nos services.\nPour tout comprendre sur notr système de commande, rendez-vous ici : <#1061021846146912347>. \n\n🇬🇧🇺🇸 Welcome <@{member.id}> ! We hope you will find your happiness in our services.\nTo understand our order system, go here : <#1061021846146912347>.", color=discord.Colour.blue())
+                          description=f"🇫🇷 Bienvenue <@{member.id}> ! "
+                                      f"Nous espérons que tu trouvera ton bonheur dans nos services.\n"
+                                      f"Pour tout comprendre sur notr système de commande, "
+                                      f"rendez-vous ici : <#1061021846146912347>. \n\n"
+                                      f"🇬🇧🇺🇸 Welcome <@{member.id}> ! "
+                                      f"We hope you will find your happiness in our services.\n"
+                                      f"To understand our order system, go here : <#1061021846146912347>.",
+                          color=discord.Colour.blue())
     embed.set_thumbnail(url=f"{member.display_avatar}")
     await channel.send(embed=embed)
 
@@ -377,10 +447,11 @@ async def on_message(message):
     for el in pending_list:
         if el[0] != message.author:
             continue
-        el[1].tab[1] = message.content
+        el[1].commentary = message.content
         await message.channel.send("🇫🇷 Commentaire enregistré avec succès.\n\n🇬🇧🇺🇸 Comment successfully saved.")
         pending_list.remove(el)
         return
+
 
 if __name__ == '__main__':
     token = config.get_token()
