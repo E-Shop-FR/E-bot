@@ -464,8 +464,6 @@ async def error_handler(interaction: discord.Interaction, error):
         await interaction.response.send_message("❌ Vous n'avez pas les permissions nécessaires pour effectuer cette action !", ephemeral=True)
 
 # Message de bienvenue
-
-
 @client.event
 async def on_member_join(member):
     channel = member.guild.system_channel
@@ -475,8 +473,6 @@ async def on_member_join(member):
     await channel.send(embed=embed)
 
 # Commentaires pour le feedback
-
-
 @client.event
 async def on_message(message):
     if message.channel not in feedback_listen:
