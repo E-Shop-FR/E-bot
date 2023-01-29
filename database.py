@@ -56,7 +56,7 @@ def add_avis(user: discord.Member, pseudo_vendeur: str, commentaire: str, note: 
     avatar_client = str(user.avatar)
     date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    cur.execute('''INSERT OR REPLACE INTO comptes (id_discord, avatar, pseudo) VALUES (?, ?, ?)''',
+    cur.execute('''INSERT OR REPLACE INTO comptes (id_discord, pseudo, avatar) VALUES (?, ?, ?)''',
                 (id_client, pseudo_client, avatar_client))
     cur.execute('''INSERT INTO avis (id_client, date_publication, pseudo_vendeur, commentaire, note) VALUES (?, ?, ?, 
     ?, ?)''',
