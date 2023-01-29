@@ -308,7 +308,7 @@ async def ticketing(interaction: discord.Interaction):
 
 
 # Commandes
-@tree.command(name="close", guild=discord.Object(id=1046437841447686226), description="Ferme le ticket")
+@tree.command(name="ticket close", guild=discord.Object(id=1046437841447686226), description="Ferme le ticket")
 async def close(interaction: discord.Interaction):
     if "ticket-for-" in interaction.channel.name:
         msg="🇬🇧🇺🇸 Are you sure you want to close this ticket ?\n\n🇫🇷Voulez-vous vraiment fermer ce ticket ?"
@@ -319,7 +319,7 @@ async def close(interaction: discord.Interaction):
 
 
 # Commandes
-@tree.command(name="add", guild=discord.Object(id=1046437841447686226), description="Ajoute un utilisateur au ticket")
+@tree.command(name="ticket add", guild=discord.Object(id=1046437841447686226), description="Ajoute un utilisateur au ticket")
 @discord.app_commands.describe(user="L'utilisateur à ajouter au ticket")
 async def add(interaction: discord.Interaction, user: discord.Member):
     if "ticket-for-" in interaction.channel.name:
@@ -367,6 +367,7 @@ async def on_member_join(member):
                           description=f"🇫🇷 Bienvenue <@{member.id}> ! Nous espérons que tu trouvera ton bonheur dans nos services.\nPour tout comprendre sur notr système de commande, rendez-vous ici : <#1061021846146912347>. \n\n🇬🇧🇺🇸 Welcome <@{member.id}> ! We hope you will find your happiness in our services.\nTo understand our order system, go here : <#1061021846146912347>.", color=discord.Colour.blue())
     embed.set_thumbnail(url=f"{member.display_avatar}")
     await channel.send(embed=embed)
+
 
 @client.event
 async def on_message(message):
