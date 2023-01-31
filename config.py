@@ -27,10 +27,6 @@ def create_file(file_name: str, json_default: dict = None):
     return path
 
 
-def db_file_path():
-    return create_file("database.db")
-
-
 def get_token():
     """
     Renvoie le token du bot
