@@ -1,5 +1,5 @@
 '''
-Ce fichier permet la gestion de la base de données. 
+Ce fichier permet la gestion de la base de données.
 '''
 
 # Imports
