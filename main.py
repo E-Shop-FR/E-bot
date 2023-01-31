@@ -6,6 +6,9 @@ import discord
 from discord.ext import commands
 import config
 import database as db
+from discord.ext import tasks
+import datetime
+import os
 from pytz import timezone
 
 # Initisalisation du bot
@@ -29,10 +32,15 @@ class AClient(discord.Client):
         if not self.added:
             self.add_view(TickerLauncher())
             self.added = True
-        print(f"🤖 Connexion réussie : {self.user}.")
+               
+        # Db
+        if not sendDbBackup.is_running():
+            sendDbBackup.start()
+        
         # Logs
         embed = discord.Embed(title="🟢 Le bot est en ligne !",
                               color=discord.Colour.dark_green())
+        print(f"🤖 Connexion réussie : {self.user}.")
         if not config.get("DEV_MODE"):
             channelLog = client.get_channel(1068629560209440780)
             await channelLog.send(embed=embed)
@@ -616,6 +624,12 @@ async def on_message(message):
         pending_list.remove(el)
         return
 
+@tasks.loop(time=datetime.time(hour=23, minute=0, second=0)) # Minuit en France (UTC+1)
+async def sendDbBackup():
+    fichier = "resources/database.db"
+    channel = client.get_channel(1068629536700366959)
+    print("Envoi de la base de données...")
+    await channel.send("Database du " + datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S") + "\n Taille : " + str(os.path.getsize(fichier)) + " octets", file=discord.File(fichier))
 
 if __name__ == '__main__':
     token = config.get_token()
