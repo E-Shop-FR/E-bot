@@ -42,6 +42,7 @@ class AClient(discord.Client):
         self.add_view(TickerLauncher())
         self.add_view(ConfirmView())
         self.add_view(ArchiveConfirm())
+        self.add_view(ConfirmClose())
 
 
 client_intents = discord.Intents.default()
@@ -207,10 +208,9 @@ class ConfirmClose(discord.ui.View):
             await channelLog.send(embed=embed)
 
             # kick du joueur channel
-            
-            if "ticket-for-" in interaction.channel.name:
-                await interaction.channel.set_permissions(user, view_channel=True, send_messages=True, attach_files=True,
-                                                        embed_links=True)
+            user = interaction.user
+            if "ticket-" in interaction.channel.name:
+                await interaction.channel.set_permissions(user, view_channel=False)
 
             else:
                 await interaction.response.send_message(
@@ -231,18 +231,21 @@ class MainView(discord.ui.View):
     def __init__(self) -> None:
         super().__init__(timeout=None)
 
+
+    # bouton qui kick le client du ticket
+    @discord.ui.button(label="delet", custom_id="ticket_button_delet", style=discord.ButtonStyle.red)
+    async def delet(self, interaction: discord.Interaction, button: discord.ui.Button):
+        msg = "🇫🇷 Voulez-vous vraiment suprimer ce ticket ?\n\n🇬🇧🇺🇸 Are you sure you want to delet this ticket ?"
+        await interaction.response.send_message(msg, view=ConfirmView(), ephemeral=True)
+
     # bouton qui suprime le ticket
     @discord.ui.button(label="Close", custom_id="ticket_button_close", style=discord.ButtonStyle.red)
     async def close(self, interaction: discord.Interaction, button: discord.ui.Button):
         msg = "🇫🇷 Voulez-vous vraiment fermer ce ticket ?\n\n🇬🇧🇺🇸 Are you sure you want to close this ticket ?"
         await interaction.response.send_message(msg, view=ConfirmClose(), ephemeral=True)
 
-    # bouton qui kick le client du ticket
-    @discord.ui.button(label="delet", custom_id="ticket_button_delet", style=discord.ButtonStyle.red)
-    async def close(self, interaction: discord.Interaction, button: discord.ui.Button):
-        msg = "🇫🇷 Voulez-vous vraiment suprimer ce ticket ?\n\n🇬🇧🇺🇸 Are you sure you want to delet this ticket ?"
-        await interaction.response.send_message(msg, view=ConfirmView(), ephemeral=True)
 
+    # bouton qui archive le client du ticket
     @discord.ui.button(label="Archive", custom_id="ticket_archive", style=discord.ButtonStyle.blurple)
     async def archive(self, interaction: discord.Interaction, button: discord.ui.Button):
         msg = "🇫🇷 Voulez-vous vraiment archiver ce ticket ?\n\n🇬🇧🇺🇸 Are you sure you want to archive this ticket ?"
