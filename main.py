@@ -599,14 +599,7 @@ async def error_handler(interaction: discord.Interaction, error):
 async def on_member_join(member):
     channel = member.guild.system_channel
     embed = discord.Embed(title="👋 WELCOME !",
-                          description=f"🇫🇷 Bienvenue <@{member.id}> ! "
-                                      f"Nous espérons que tu trouvera ton bonheur dans nos services.\n"
-                                      f"Pour tout comprendre sur notr système de commande, "
-                                      f"rendez-vous ici : <#1061021846146912347>. \n\n"
-                                      f"🇬🇧🇺🇸 Welcome <@{member.id}> ! "
-                                      f"We hope you will find your happiness in our services.\n"
-                                      f"To understand our order system, go here : <#1061021846146912347>.",
-                          color=discord.Colour.blue())
+    description=f"🇫🇷 Bienvenue <@{member.id}> ! Nous espérons que vous serez satisfait par nos services.\nPour tout comprendre sur notr système de commande, rendez-vous ici : <#1061021846146912347>. \n\n🇬🇧🇺🇸 Welcome <@{member.id}> ! We hope you will be satisfied by our services.\nTo understand our order system, go here : <#1061021846146912347>.", color=discord.Colour.blue())
     embed.set_thumbnail(url=f"{member.display_avatar}")
     await channel.send(embed=embed)
 
