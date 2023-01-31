@@ -5,6 +5,9 @@ Classe principale du bot.
 import discord
 import config
 import database as db
+from discord.ext import tasks
+import datetime
+import os
 
 
 # Initisalisation du bot
@@ -27,6 +30,10 @@ class AClient(discord.Client):
             self.add_view(TickerLauncher())
             self.added = True
         print(f"🤖 Connexion réussie : {self.user}.")
+        
+        # Db
+        if not sendDbBackup.is_running():
+            sendDbBackup.start()
 
     async def setup_hook(self) -> None:
         self.add_view(MainView())
@@ -356,6 +363,15 @@ async def on_message(message):
         await message.channel.send("🇫🇷 Commentaire enregistré avec succès.\n\n🇬🇧🇺🇸 Comment successfully saved.")
         pending_list.remove(el)
         return
+
+@tasks.loop(time=datetime.time(hour=23, minute=0, second=0)) # Minuit en France (UTC+1)
+async def sendDbBackup():
+    fichier = "resources/database.db"
+    channel = client.get_channel(1068629536700366959)
+    print("Envoi de la base de données...")
+    await channel.send("Database du " + datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S") + "\n Taille : " + str(os.path.getsize(fichier)) + " octets", file=discord.File(fichier))
+    
+    
 
 if __name__ == '__main__':
     token = config.get_token()
