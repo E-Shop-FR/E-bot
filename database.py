@@ -1,4 +1,4 @@
-''' 
+'''
 Ce fichier permet la gestion de la base de données.
 '''
 
