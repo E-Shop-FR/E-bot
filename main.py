@@ -15,8 +15,6 @@ from pytz import timezone
 
 
 # Initisalisation du bot
-
-
 class AClient(discord.Client):
     """
     Discord client
@@ -45,7 +43,7 @@ class AClient(discord.Client):
                               color=discord.Colour.dark_green())
         print(f"🤖 Connexion réussie : {self.user}.")
         self.loop.create_task(self.status_task())
-        if not config.get("DEV_MODE"):
+        if config.get("DEV_MODE") == "True":
             channelLog = client.get_channel(1068629560209440780)
             await channelLog.send(embed=embed)
 
@@ -59,19 +57,19 @@ class AClient(discord.Client):
         while True:
             await self.change_presence(
                 activity=discord.Activity(type=discord.ActivityType.watching,
-                                          name=f"{len(guild.members)} membres", emoji=emoji_dict))
+                                          name=f"🫡 {len(guild.members)} membres", emoji=emoji_dict))
             await asyncio.sleep(10)
             await self.change_presence(
                 activity=discord.Activity(type=discord.ActivityType.watching,
-                                          name='Les commandes de E-Shop', emoji=emoji_dict))
+                                          name='🛒 Les commandes de E-Shop', emoji=emoji_dict))
             await asyncio.sleep(10)
             await self.change_presence(
                 activity=discord.Activity(type=discord.ActivityType.watching,
-                                          name=f"{len(guild.members)} members", emoji=emoji_dict))
+                                          name=f"🫡 {len(guild.members)} members", emoji=emoji_dict))
             await asyncio.sleep(10)
             await self.change_presence(
                 activity=discord.Activity(type=discord.ActivityType.watching,
-                                          name="E-Shop's commands", emoji=emoji_dict))
+                                          name="🛒 E-Shop's commands", emoji=emoji_dict))
             await asyncio.sleep(10)
 
     async def setup_hook(self) -> None:
@@ -352,7 +350,9 @@ class ArchiveConfirm(discord.ui.View):
 
 
 class Questionnaire(discord.ui.Modal):
-
+    '''
+    Objet contenant 1 champ de texte avec l'évenement confirmation commentaire
+    '''
     def __init__(self, feedback_view):
         super(Questionnaire, self).__init__(title='Comment for feedback')
         self.feedback_view = feedback_view
@@ -364,7 +364,7 @@ class Questionnaire(discord.ui.Modal):
             await interaction.response.defer()
             return
         self.feedback_view.commentary = self.name.value
-        await interaction.response.send_message(f'Thanks for your response, {self.name}!', ephemeral=True)
+        await interaction.response.send_message(f'🇫🇷 Merci pour votre réponse. \n\n🇬🇧🇺🇸 Thanks for your response', ephemeral=True)
 
 
 class FeedBack(discord.ui.View):
@@ -372,12 +372,12 @@ class FeedBack(discord.ui.View):
     Objet contenant 6 boutons avec les évenements de feedback
     """
 
-    def __init__(self, feedbacker: discord.Member, freelancer: discord.Member):
+    def __init__(self, feedbacker: discord.Member, commande: str):
         super().__init__(timeout=None)
-        self.feedbacker = feedbacker
+        self.commande = commande
         self.commentary = None
         self.star_numb = 5
-        self.freelancer = freelancer
+        self.feedbacker = feedbacker
 
     @discord.ui.select(
         max_values=1,
@@ -412,7 +412,7 @@ class FeedBack(discord.ui.View):
     @discord.ui.button(label="✅", custom_id="comment_fini", style=discord.ButtonStyle.green)
     async def finish(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.commentary is not None:
-            db.add_avis(self.feedbacker, self.freelancer.name, self.commentary, self.star_numb)
+            db.add_avis(self.feedbacker, self.commande, self.commentary, self.star_numb)
             if self.star_numb in (1, 2):
                 await interaction.response.send_message(
                     "🇫🇷 Commentaire enregistré avec succès. "
@@ -430,7 +430,7 @@ class FeedBack(discord.ui.View):
             embed = discord.Embed(title="📝 FEEDBACK",
                                   description=f"""
             **Client :** {interaction.user.mention}
-            **Freelancer :** {self.freelancer}
+            **Type de commande :** {self.commande}
             **Note :** {self.star_numb}/5
             **Commentaire :** {self.commentary}
             """, color=discord.Color.purple())
@@ -547,8 +547,8 @@ async def add(interaction: discord.Interaction, user: discord.Member):
 
 
 @tree.command(name="feedback", guild=discord.Object(id=1046437841447686226), description="Lance le système de feedback")
-@discord.app_commands.describe(freelancer="Freelancer concerné")
-async def launch_feedback(interaction: discord.Interaction, freelancer: discord.Member):
+@discord.app_commands.describe(commande="Commandes passée")
+async def launch_feedback(interaction: discord.Interaction, commande: str):
     embed = discord.Embed(title="🌟 FEEDBACK",
                           description="🇫🇷 Afin d'avoir un retour clair sur notre service, "
                                       "nous vous invitons à ajouter un commentaire et une note à E-shop "
@@ -559,7 +559,7 @@ async def launch_feedback(interaction: discord.Interaction, freelancer: discord.
                                       "This will only take a few minutes.",
                           color=discord.Colour.blue())
     await interaction.channel.send(embed=embed,
-                                   view=FeedBack(feedbacker=interaction.user, freelancer=freelancer))
+                                   view=FeedBack(feedbacker=interaction.user, commande=commande))
     await interaction.response.send_message("✅ Système de feedback lancé avec succès !", ephemeral=True)
 
 
