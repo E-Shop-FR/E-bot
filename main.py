@@ -438,8 +438,6 @@ class FeedBack(discord.ui.View):
             message = await channelLog.send(embed=embed)
             await message.add_reaction("✅")
 
-            await interaction.response.send_message(
-                "🇫🇷 **Merci pour votre retour !** 💖 \n\n🇬🇧🇺🇸 **Thank you for your feedback !** 💖")
         else:
             await interaction.response.send_message(
                 "🇫🇷 Vous n'avez pas donné de note ou de commentaire. \n\n"
