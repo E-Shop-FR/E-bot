@@ -423,7 +423,7 @@ class FeedBack(discord.ui.View):
                     "Your comment will be taken into account so that this does not happen again.")
             else:
                 await interaction.response.send_message(
-                    "🇫🇷 **Merci pour votre retour !** 💖 \n\n🇬🇧🇺🇸 **Thank you for your feedback !** 💖")
+                    "🇫🇷 **Merci pour votre retour ! Rendez-vous dans le channel <#1061023547402768505> pour ajouter la réaction sous votre message pour certifier son authenticité.** 💖 \n\n🇬🇧🇺🇸 **Thank you for your feedback ! Go to the channel <#1061023547402768505> to add the reaction under your message to certify its authenticity.** 💖")
 
             # Embed
             channelLog = client.get_channel(1061023547402768505)
@@ -599,7 +599,9 @@ async def sendDbBackup():
     fichier = "resources/database.db"
     channel = client.get_channel(1068629536700366959)
     print("Envoi de la base de données...")
-    await channel.send("Database du " + datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S") + "\n Taille : " + str(
+    date = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    date = date.astimezone(tz=timezone('Europe/Paris'))
+    await channel.send("Database du " + date + "\n Taille : " + str(
         os.path.getsize(fichier)) + " octets", file=discord.File(fichier))
 
 
