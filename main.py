@@ -577,20 +577,25 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
     """
     Modifie les points de fidélité d'un client
     """
+    channelLog = client.get_channel(1068629560209440780)
     if action == 'reset':
         db.reset_client_points(user)
         await interaction.response.send_message(
             f"✅ Points de fidélité de {user} réinitialisés avec succès !")
+        await channelLog.send(f"🌟 Points de fidélité de {user} réinitialisés par {interaction.user} !")
 
     elif action == 'add':
         db.add_client_points(user, points)
         await interaction.response.send_message(
             f"✅ {points} points de fidélité ajoutés à {user} avec succès !")
+        await channelLog.send(f"🌟 {points} points ajoutés à {user} par {interaction.user} !")
 
     elif action == 'remove':
         db.remove_client_points(user, points)
         await interaction.response.send_message(
             f"✅ {points} points de fidélité retirés à {user} avec succès !")
+        await channelLog.send(f"🌟 {points} points retirés à {user} par {interaction.user} !")
+
     else:
         points = db.get_client_points(user)
         await interaction.response.send_message(
