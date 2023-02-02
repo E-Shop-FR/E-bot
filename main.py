@@ -600,7 +600,7 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
         points = db.get_client_points(user)
         await interaction.response.send_message(
             f"🌟 Nombre de points de {user} : {points}")
-        await channelLog.send("🌟 Commande de visualisation des points de fidélité effectuée par {interaction.user} ! Il en a {points}")
+        await channelLog.send(f"🌟 Commande de visualisation des points de fidélité effectuée pour {user} ! Il en a {points}")
 
 '''
 @tree.error
