@@ -654,8 +654,9 @@ async def sendDbBackup():
     fichier = "resources/database.db"
     channel = client.get_channel(1068629536700366959)
     print("Envoi de la base de données...")
-    date = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    date = datetime.datetime.now()
     date = date.astimezone(tz=timezone('Europe/Paris'))
+    date = date.strftime("%d/%m/%Y à %H:%M:%S")
     await channel.send("Database du " + date + "\n Taille : " + str(
         os.path.getsize(fichier)) + " octets", file=discord.File(fichier))
 
