@@ -121,10 +121,13 @@ def add_client_points(client: discord.Member, points: int):
     name = client.name
     avatar = str(client.avatar)
 
-    cur.execute("""INSERT INTO comptes (id_discord, pseudo, avatar, points_fidelite) VALUES (?, ?, ?, ?)
-                ON CONFLICT (id_discord) DO UPDATE 
-                SET points_fidelite = (points_fidelite + ?)""",
-                (id_client, name, avatar, points, points))
+    cur.execute("SELECT * FROM comptes WHERE id_discord=?", (id_client,))
+    data = cur.fetchone()
+
+    if data is not None:
+        cur.execute("UPDATE comptes SET points_fidelite = points_fidelite + ? WHERE id_discord = ?", (points, id_client))
+    else:
+        cur.execute("INSERT INTO comptes (id_discord, pseudo, avatar, points_fidelite) VALUES (?, ?, ?, ?)", (id_client, name, avatar, points))
     con.commit()
 
 
@@ -139,9 +142,13 @@ def remove_client_points(client: discord.Member, points: int):
     name = client.name
     avatar = str(client.avatar)
 
-    cur.execute("""INSERT INTO comptes (id_discord, pseudo, avatar, points_fidelite) VALUES (?, ?, ?, ?)
-                ON CONFLICT (id_discord) DO UPDATE SET points_fidelite = (points_fidelite - ?)""",
-                (id_client, name, avatar, -points, points))
+    cur.execute("SELECT * FROM comptes WHERE id_discord=?", (id_client,))
+    data = cur.fetchone()
+
+    if data is not None:
+        cur.execute("UPDATE comptes SET points_fidelite = points_fidelite - ? WHERE id_discord = ?", (points, id_client))
+    else:
+        cur.execute("INSERT INTO comptes (id_discord, pseudo, avatar, points_fidelite) VALUES (?, ?, ?, ?)", (id_client, name, avatar, points))
     con.commit()
 
 
@@ -155,11 +162,16 @@ def set_client_points(client: discord.Member, points: int):
     id_client = client.id
     name = client.name
     avatar = str(client.avatar)
+    
+    cur.execute("SELECT * FROM comptes WHERE id_discord=?", (id_client,))
+    data = cur.fetchone()
 
-    cur.execute("""INSERT INTO comptes (id_discord, pseudo, avatar, points_fidelite) VALUES (?, ?, ?, ?)
-                ON CONFLICT (id_discord) DO UPDATE SET points_fidelite = ?""",
-                (id_client, name, avatar, points, points))
+    if data is not None:
+        cur.execute("UPDATE comptes SET points_fidelite = ? WHERE id_discord = ?", (points, id_client))
+    else:
+        cur.execute("INSERT INTO comptes (id_discord, pseudo, avatar, points_fidelite) VALUES (?, ?, ?, ?)", (id_client, name, avatar, points))
     con.commit()
+
 
 
 def reset_client_points(client: discord.Member):
@@ -170,10 +182,14 @@ def reset_client_points(client: discord.Member):
     id_client = client.id
     name = client.name
     avatar = str(client.avatar)
+    
+    cur.execute("SELECT * FROM comptes WHERE id_discord=?", (id_client,))
+    data = cur.fetchone()
 
-    cur.execute("""INSERT INTO comptes (id_discord, pseudo, avatar, points_fidelite) VALUES (?, ?, ?, 0)
-                ON CONFLICT (id_discord) DO UPDATE SET points_fidelite = 0""",
-                (id_client, name, avatar))
+    if data is not None:
+        cur.execute("UPDATE comptes SET points_fidelite = 0 WHERE id_discord = ?", (id_client, ))
+    else:
+        cur.execute("INSERT INTO comptes (id_discord, pseudo, avatar, points_fidelite) VALUES (?, ?, ?, 0)", (id_client, name, avatar))
     con.commit()
 
 
