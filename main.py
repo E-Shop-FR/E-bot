@@ -3,6 +3,7 @@ Classe principale du bot.
 """
 # Imports
 import asyncio
+from typing import Optional
 
 import discord
 from discord.ext import commands
@@ -43,9 +44,8 @@ class AClient(discord.Client):
                               color=discord.Colour.dark_green())
         print(f"🤖 Connexion réussie : {self.user}.")
         self.loop.create_task(self.status_task())
-        if config.get("DEV_MODE") == "True":
-            channelLog = client.get_channel(1068629560209440780)
-            await channelLog.send(embed=embed)
+        channelLog = client.get_channel(1068629560209440780)
+        await channelLog.send(embed=embed)
 
     async def status_task(self):
         guild = self.get_guild(1046437841447686226)
@@ -181,34 +181,34 @@ class ConfirmView(discord.ui.View):
                 f"🇬🇧🇺🇸 You don't have permission to delete this ticket!",
                 ephemeral=True)
             return
-        try:
-            # Log delete ticket
-            channelLog = client.get_channel(1068629560209440780)
-            # Fetch des users ayant parlé dans le channel
-            users = [message.author.mention async for message in interaction.channel.history(limit=200)]
-            users = list(set(users))  # Suppression des doublons
-            users = ", ".join(users)  # Conversion en string
+        else:
+            try:
+                # Log delete ticket
+                channelLog = client.get_channel(1068629560209440780)
+                # Fetch des users ayant parlé dans le channel
+                users = [message.author.mention async for message in interaction.channel.history(limit=200)]
+                users = list(set(users))  # Suppression des doublons
+                users = ", ".join(users)  # Conversion en string
 
-            # Date conversion et formatage
-            date = interaction.created_at
-            date = date.astimezone(tz=timezone('Europe/Paris'))
-            date = date.strftime("%d/%m/%Y à %H:%M:%S")
+                # Date conversion et formatage
+                date = interaction.created_at
+                date = date.astimezone(tz=timezone('Europe/Paris'))
+                date = date.strftime("%d/%m/%Y à %H:%M:%S")
 
-            embed = discord.Embed(title="🎫 TICKET suprimer",
-                                  description=f"""**Nom du channel :** {interaction.channel.name}
-                                    \n**Fermé par :** {interaction.user.mention}
-                                    \n **Utilisateurs ayant parlé dans le ticket :** {users}
-                                    \n**Date de supression :** {date}""", color=discord.Colour.red())
-            await channelLog.send(embed=embed)
-
-            # delet channel
-            await interaction.channel.delete()
-        except:
-            await interaction.response.send_message(
-                "🇫🇷 Impossible de supprimer le channel. Merci de vérifier "
-                "que je possède la permission MANAGE_CHANNELS.\n\n"
-                "🇬🇧🇺🇸 I can't delete this channel. Please check that i have the MANAGE_CHANNELS permission.",
-                ephemeral=True)
+                embed = discord.Embed(title="🎫 TICKET SUPPRIME",
+                                    description=f"""**Nom du channel :** {interaction.channel.name}
+                                        \n**Fermé par :** {interaction.user.mention}
+                                        \n **Utilisateurs ayant parlé dans le ticket :** {users}
+                                        \n**Date de supression :** {date}""", color=discord.Colour.red())
+                await channelLog.send(embed=embed)
+                # delet channel
+                await interaction.channel.delete()
+            except:
+                await interaction.response.send_message(
+                    "🇫🇷 Impossible de supprimer le channel. Merci de vérifier "
+                    "que je possède la permission MANAGE_CHANNELS.\n\n"
+                    "🇬🇧🇺🇸 I can't delete this channel. Please check that i have the MANAGE_CHANNELS permission.",
+                    ephemeral=True)
 
 
 class ConfirmClose(discord.ui.View):
@@ -221,12 +221,6 @@ class ConfirmClose(discord.ui.View):
 
     @discord.ui.button(label="Confirm", style=discord.ButtonStyle.red, custom_id="confirm")
     async def confirm_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        if interaction.user.guild_permissions.manage_channels is False:
-            await interaction.response.send_message(
-                f"🇫🇷 Vous n'avez pas la permission de fermer ce ticket!\n\n"
-                f"🇬🇧🇺🇸 You don't have permission to fermer this ticket!",
-                ephemeral=True)
-            return
         try:
             # Log fermeture ticket
             channelLog = client.get_channel(1068629560209440780)
@@ -271,19 +265,19 @@ class MainView(discord.ui.View):
         super().__init__(timeout=None)
 
     # bouton qui kick le client du ticket
-    @discord.ui.button(label="Delete", custom_id="ticket_button_delete", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="❌ Delete", custom_id="ticket_button_delete", style=discord.ButtonStyle.red)
     async def delete(self, interaction: discord.Interaction, button: discord.ui.Button):
         msg = "🇫🇷 Voulez-vous vraiment suprimer ce ticket ?\n\n🇬🇧🇺🇸 Are you sure you want to delete this ticket ?"
         await interaction.response.send_message(msg, view=ConfirmView(), ephemeral=True)
 
     # bouton qui suprime le ticket
-    @discord.ui.button(label="Close", custom_id="ticket_button_close", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="✅ Close", custom_id="ticket_button_close", style=discord.ButtonStyle.red)
     async def close(self, interaction: discord.Interaction, button: discord.ui.Button):
         msg = "🇫🇷 Voulez-vous vraiment fermer ce ticket ?\n\n🇬🇧🇺🇸 Are you sure you want to close this ticket ?"
         await interaction.response.send_message(msg, view=ConfirmClose(), ephemeral=True)
 
     # bouton qui archive le client du ticket
-    @discord.ui.button(label="Archive", custom_id="ticket_archive", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="🗃️ Archive", custom_id="ticket_archive", style=discord.ButtonStyle.blurple)
     async def archive(self, interaction: discord.Interaction, button: discord.ui.Button):
         msg = "🇫🇷 Voulez-vous vraiment archiver ce ticket ?\n\n🇬🇧🇺🇸 Are you sure you want to archive this ticket ?"
         await interaction.response.send_message(msg, view=ArchiveConfirm(), ephemeral=True)
@@ -305,54 +299,55 @@ class ArchiveConfirm(discord.ui.View):
                 f"🇬🇧🇺🇸 You don't have permission to archive this ticket!",
                 ephemeral=True)
             return
-        try:
-            category = discord.utils.get(
-                interaction.guild.categories, id=1061049218569084948)
-            channel = interaction.channel
-            if channel.category == category:
+        else:
+            try:
+                category = discord.utils.get(
+                    interaction.guild.categories, id=1061049218569084948)
+                channel = interaction.channel
+                if channel.category == category:
+                    await interaction.response.send_message(
+                        "🇫🇷 Vous ne pouvez-pas archiver un ticket déjà archivé !\n\n"
+                        "🇬🇧🇺🇸 You cannot archive a ticket twice !",
+                        ephemeral=True)
+                    return
+
+                await channel.edit(category=category, name=channel.name + "-archived")
+                await interaction.response.defer()
+
+                # Log archive ticket
+                channelLog = client.get_channel(1068629560209440780)
+
+                # Log fermeture ticket
+                channelLog = client.get_channel(1068629560209440780)
+                # Fetch des users ayant parlé dans le channel
+                users = [message.author.mention async for message in interaction.channel.history(limit=200)]
+                users = list(set(users))  # Suppression des doublons
+                users = ", ".join(users)  # Conversion en string
+
+                # Date conversion et formatage
+                date = interaction.created_at
+                date = date.astimezone(tz=timezone('Europe/Paris'))
+                date = date.strftime("%d/%m/%Y à %H:%M:%S")
+
+                embed = discord.Embed(title="🎫 TICKET ARCHIVE",
+                                    description=f"""**Channel :** {interaction.channel.mention}
+                                        \n**Fermé par :** {interaction.user.mention}
+                                        \n **Utilisateurs ayant parlé dans le ticket :** {users}
+                                        \n**Date de fermeture :** {date}""", color=discord.Colour.blurple())
+                await channelLog.send(embed=embed)
+
+            except:
                 await interaction.response.send_message(
-                    "🇫🇷 Vous ne pouvez-pas archiver un ticket déjà archivé !\n\n"
-                    "🇬🇧🇺🇸 You cannot archive a ticket twice !",
+                    "🇫🇷 Impossible de déplacer le channel. "
+                    "Merci de vérifier que je possède la permission MANAGE_CHANNELS.\n\n"
+                    "🇬🇧🇺🇸 I can't archive this channel. Please check that i have the MANAGE_CHANNELS permission.",
                     ephemeral=True)
-                return
-
-            await channel.edit(category=category, name=channel.name + "-archived")
-            await interaction.response.defer()
-
-            # Log archive ticket
-            channelLog = client.get_channel(1068629560209440780)
-
-            # Log fermeture ticket
-            channelLog = client.get_channel(1068629560209440780)
-            # Fetch des users ayant parlé dans le channel
-            users = [message.author.mention async for message in interaction.channel.history(limit=200)]
-            users = list(set(users))  # Suppression des doublons
-            users = ", ".join(users)  # Conversion en string
-
-            # Date conversion et formatage
-            date = interaction.created_at
-            date = date.astimezone(tz=timezone('Europe/Paris'))
-            date = date.strftime("%d/%m/%Y à %H:%M:%S")
-
-            embed = discord.Embed(title="🎫 TICKET ARCHIVE",
-                                  description=f"""**Channel :** {interaction.channel.mention}
-                                    \n**Fermé par :** {interaction.user.mention}
-                                    \n **Utilisateurs ayant parlé dans le ticket :** {users}
-                                    \n**Date de fermeture :** {date}""", color=discord.Colour.blurple())
-            await channelLog.send(embed=embed)
-
-        except:
-            await interaction.response.send_message(
-                "🇫🇷 Impossible de déplacer le channel. "
-                "Merci de vérifier que je possède la permission MANAGE_CHANNELS.\n\n"
-                "🇬🇧🇺🇸 I can't archive this channel. Please check that i have the MANAGE_CHANNELS permission.",
-                ephemeral=True)
 
 
 class Questionnaire(discord.ui.Modal):
-    '''
+    """
     Objet contenant 1 champ de texte avec l'évenement confirmation commentaire
-    '''
+    """
     def __init__(self, feedback_view):
         super(Questionnaire, self).__init__(title='Comment for feedback')
         self.feedback_view = feedback_view
@@ -423,7 +418,12 @@ class FeedBack(discord.ui.View):
                     "Your comment will be taken into account so that this does not happen again.")
             else:
                 await interaction.response.send_message(
-                    "🇫🇷 **Merci pour votre retour ! Rendez-vous dans le channel <#1061023547402768505> pour ajouter la réaction sous votre message pour certifier son authenticité.** 💖 \n\n🇬🇧🇺🇸 **Thank you for your feedback ! Go to the channel <#1061023547402768505> to add the reaction under your message to certify its authenticity.** 💖")
+                    "🇫🇷 **Merci pour votre retour ! "
+                    "Rendez-vous dans le channel <#1061023547402768505> "
+                    "pour ajouter la réaction sous votre message pour certifier son authenticité.** 💖 \n\n"
+                    "🇬🇧🇺🇸 **Thank you for your feedback ! "
+                    "Go to the channel <#1061023547402768505> "
+                    "to add the reaction under your message to certify its authenticity.** 💖")
 
             # Embed
             channelLog = client.get_channel(1061023547402768505)
@@ -454,7 +454,7 @@ async def ping(interaction: discord.Interaction):
     """
     await interaction.response.send_message(f"🏓 Pong ! {round(client.latency, 3)} ms!")
 
-
+'''
 @tree.command(name="test", description="Test dev", guild=discord.Object(id=1046437841447686226))
 @commands.has_permissions(administrator=True)
 async def test(interaction: discord.Interaction):
@@ -473,11 +473,12 @@ async def test(interaction: discord.Interaction):
                           color=discord.Colour.blue())
     embed.set_thumbnail(url=f"{member.display_avatar}")
     await interaction.response.send_message(embed=embed)
+'''
 
 
 @tree.command(name="clear", description="Retirer des messages d'un channel",
               guild=discord.Object(id=1046437841447686226))
-@commands.has_permissions(manage_channels=True)
+@discord.app_commands.checks.has_permissions(manage_channels=True)
 async def self(ctx, amount: int = None):
     """
     Retire des messages d'un channel
@@ -498,10 +499,9 @@ async def self(ctx, amount: int = None):
                                     ephemeral=True)
             await ctx.channel.purge(limit=amount)
 
-
 @tree.command(name="ticket", guild=discord.Object(id=1046437841447686226),
               description="Lance le système de ticket en affichant le message avec la réaction")
-@commands.has_permissions(administrator=True)
+@discord.app_commands.checks.has_permissions(administrator=True)
 async def ticketing(interaction: discord.Interaction):
     """
     Lance le système de ticket en affichant le message avec la réaction
@@ -516,12 +516,12 @@ async def ticketing(interaction: discord.Interaction):
 
 
 @tree.command(name="close", guild=discord.Object(id=1046437841447686226), description="Ferme le ticket")
-@commands.has_permissions(manage_channels=True)
+@discord.app_commands.checks.has_permissions(manage_channels=True)
 async def close(interaction: discord.Interaction):
     """
     Ferme le ticket
     """
-    if "ticket-for-" in interaction.channel.name:
+    if "ticket-" in interaction.channel.name:
         msg = "🇬🇧🇺🇸 Are you sure you want to close this ticket ?\n\n🇫🇷Voulez-vous vraiment fermer ce ticket ?"
         await interaction.response.send_message(msg, view=ConfirmView(), ephemeral=True)
     else:
@@ -537,9 +537,11 @@ async def add(interaction: discord.Interaction, user: discord.Member):
     """
     Ajoute un utilisateur au ticket
     """
-    if "ticket-for-" in interaction.channel.name:
+    if "ticket-" in interaction.channel.name:
         await interaction.channel.set_permissions(user, view_channel=True, send_messages=True, attach_files=True,
                                                   embed_links=True)
+        await interaction.response.send_message(
+            f"🇬🇧🇺🇸 {user} has now access to this ticket.\n\n🇫🇷 {user} a désormais accès à ce ticket.", ephemeral=True)
 
     else:
         await interaction.response.send_message(
@@ -547,6 +549,7 @@ async def add(interaction: discord.Interaction, user: discord.Member):
 
 
 @tree.command(name="feedback", guild=discord.Object(id=1046437841447686226), description="Lance le système de feedback")
+@discord.app_commands.checks.has_permissions(manage_channels=True)
 @discord.app_commands.describe(commande="Commandes passée")
 async def launch_feedback(interaction: discord.Interaction, commande: str):
     embed = discord.Embed(title="🌟 FEEDBACK",
@@ -563,6 +566,58 @@ async def launch_feedback(interaction: discord.Interaction, commande: str):
     await interaction.response.send_message("✅ Système de feedback lancé avec succès !", ephemeral=True)
 
 
+@tree.command(name="points", guild=discord.Object(id=1046437841447686226), description="Permet de modifier ou visualiser les points de fidélité d'un client")
+@discord.app_commands.choices(action=[
+    discord.app_commands.Choice(name="reset", value='reset'),
+    discord.app_commands.Choice(name="add", value='add'),
+    discord.app_commands.Choice(name="remove", value='remove'),
+    discord.app_commands.Choice(name="show", value='show')
+])
+async def fidelity_points(interaction: discord.Interaction, user: discord.Member, action: str, points: Optional[int]):
+    """
+    Modifie les points de fidélité d'un client
+    """
+    if action == 'reset':
+        db.reset_client_points(user)
+        await interaction.response.send_message(
+            f"✅ Points de fidélité de {user} réinitialisés avec succès !")
+
+    elif action == 'add':
+        db.add_client_points(user, points)
+        await interaction.response.send_message(
+            f"✅ {points} points de fidélité ajoutés à {user} avec succès !")
+
+    elif action == 'remove':
+        db.remove_client_points(user, points)
+        await interaction.response.send_message(
+            f"✅ {points} points de fidélité retirés à {user} avec succès !")
+    else:
+        points = db.get_client_points(user)
+        await interaction.response.send_message(
+            f"🌟 Nombre de points de {user} : {points}")
+
+'''
+@tree.error
+async def error_handler(interaction: discord.Interaction, error):
+    if config.get("DEV_MODE") == "False":
+        # if isinstance(error, discord.app_commands.errors.Forbidden):
+        #     await interaction.response.send_message("❌ Je n'ai pas les permissions nécessaires pour effectuer cette action !", ephemeral=True)
+        if isinstance(error, discord.app_commands.errors.HTTPException):
+            await interaction.response.send_message("❌ Une erreur est survenue lors de l'envoi du message !", ephemeral=True)
+        # elif isinstance(error, discord.app_commands.errors.NotFound):
+        #         await interaction.response.send_message("❌ Une erreur est survenue lors de l'envoi du message !", ephemeral=True)
+         # elif isinstance(error, discord.app_commands.errors.MissingRequiredArgument):
+        #     await interaction.response.send_message("❌ Vous n'avez pas renseigné tous les arguments nécessaires !", ephemeral=True)
+        # elif isinstance(error, discord.app_commands.errors.BadArgument):
+        #     await interaction.response.send_message("❌ Vous n'avez pas renseigné un argument correct !", ephemeral=True)
+        elif isinstance(error, discord.app_commands.errors.CommandInvokeError):
+            await interaction.response.send_message("❌ Une erreur est survenue lors de l'envoi du message !", ephemeral=True)
+        elif isinstance(error, discord.app_commands.errors.CommandNotFound):
+            await interaction.response.send_message("❌ Cette commande n'existe pas !", ephemeral=True)
+        elif isinstance(error, discord.app_commands.errors.CheckFailure) or isinstance(error, discord.app_commands.errors.MissingPermissions):
+            await interaction.response.send_message("❌ Vous n'avez pas les permissions nécessaires pour effectuer cette action !", ephemeral=True)
+        else: raise error
+'''
 # Message de bienvenue
 @client.event
 async def on_member_join(member):
