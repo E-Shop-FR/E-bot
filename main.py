@@ -541,7 +541,7 @@ async def add(interaction: discord.Interaction, user: discord.Member):
         await interaction.channel.set_permissions(user, view_channel=True, send_messages=True, attach_files=True,
                                                   embed_links=True)
         await interaction.response.send_message(
-            f"🇬🇧🇺🇸 {user} has now access to this ticket.\n\n🇫🇷 {user} a désormais accès à ce ticket.", ephemeral=True)
+            f"🇬🇧🇺🇸 {user} has now access to this ticket.\n\n🇫🇷 {user} a désormais accès à ce ticket.")
 
     else:
         await interaction.response.send_message(
@@ -581,7 +581,7 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
     if action == 'reset':
         db.reset_client_points(user)
         await interaction.response.send_message(
-            f"✅ Points de fidélité de {user} réinitialisés avec succès !")
+            f"🇫🇷 Points de fidélité de {user} réinitialisés avec succès ! \n\n 🇬🇧🇺🇸 {user} fidelity points reset with success !")
         embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
                               description="Action : Réinitialisation\n"
                                             f"Victime : {user}\n"
@@ -593,7 +593,7 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
     elif action == 'add':
         db.add_client_points(user, points)
         await interaction.response.send_message(
-            f"✅ {points} points de fidélité ajoutés à {user} avec succès !")
+            f"{points} points de fidélité ajoutés à {user} avec succès ! \n\n 🇬🇧🇺🇸 {points} fidelity points added to {user} with success !")
         embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
                                 description="Action : Ajout\n"
                                                 f"Victime : {user}\n"
@@ -605,7 +605,7 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
     elif action == 'remove':
         db.remove_client_points(user, points)
         await interaction.response.send_message(
-            f"✅ {points} points de fidélité retirés à {user} avec succès !")
+            f"✅ {points} points de fidélité retirés à {user} avec succès ! \n\n 🇬🇧🇺🇸 {points} fidelity points removed to {user} with success !")
         embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
                                 description="Action : Retrait\n"
                                                 f"Victime : {user}\n"
@@ -617,7 +617,7 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
     else:
         points = db.get_client_points(user)
         await interaction.response.send_message(
-            f"🌟 Nombre de points de {user} : {points}")
+            f"🌟 Nombre de points de {user} : {points} \n\n 🇬🇧🇺🇸 {user} fidelity points : {points}")
         embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
                                 description="Action : Visualisation\n"
                                                 f"Victime : {user}\n"
