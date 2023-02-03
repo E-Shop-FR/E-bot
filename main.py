@@ -196,7 +196,7 @@ class ConfirmView(discord.ui.View):
                 date = date.strftime("%d/%m/%Y à %H:%M:%S")
 
                 embed = discord.Embed(title="🎫 TICKET SUPPRIME",
-                                    description=f"""**Nom du channel :** {interaction.channel.name}
+                                      description=f"""**Nom du channel :** {interaction.channel.name}
                                         \n**Fermé par :** {interaction.user.mention}
                                         \n **Utilisateurs ayant parlé dans le ticket :** {users}
                                         \n**Date de supression :** {date}""", color=discord.Colour.red())
@@ -330,7 +330,7 @@ class ArchiveConfirm(discord.ui.View):
                 date = date.strftime("%d/%m/%Y à %H:%M:%S")
 
                 embed = discord.Embed(title="🎫 TICKET ARCHIVE",
-                                    description=f"""**Channel :** {interaction.channel.mention}
+                                      description=f"""**Channel :** {interaction.channel.mention}
                                         \n**Fermé par :** {interaction.user.mention}
                                         \n **Utilisateurs ayant parlé dans le ticket :** {users}
                                         \n**Date de fermeture :** {date}""", color=discord.Colour.blurple())
@@ -348,10 +348,12 @@ class Questionnaire(discord.ui.Modal):
     """
     Objet contenant 1 champ de texte avec l'évenement confirmation commentaire
     """
+
     def __init__(self, feedback_view):
         super(Questionnaire, self).__init__(title='Comment for feedback')
         self.feedback_view = feedback_view
-        self.name = discord.ui.TextInput(label="Please enter your comment there", min_length=0, max_length=30)
+        self.name = discord.ui.TextInput(
+            label="Please enter your comment there", min_length=0, max_length=30)
         self.add_item(self.name)
 
     async def on_submit(self, interaction: discord.Interaction):
@@ -383,7 +385,8 @@ class FeedBack(discord.ui.View):
             discord.SelectOption(label="⭐⭐", description="2 Etoiles"),
             discord.SelectOption(label="⭐⭐⭐", description="3 Etoiles"),
             discord.SelectOption(label="⭐⭐⭐⭐", description="4 Etoiles"),
-            discord.SelectOption(label="⭐⭐⭐⭐⭐", description="5 Etoiles", default=True)
+            discord.SelectOption(
+                label="⭐⭐⭐⭐⭐", description="5 Etoiles", default=True)
         ])
     async def mark(self, interaction: discord.Interaction, menu: discord.ui.Select):
         if interaction.user != self.feedbacker:
@@ -407,7 +410,8 @@ class FeedBack(discord.ui.View):
     @discord.ui.button(label="✅", custom_id="comment_fini", style=discord.ButtonStyle.green)
     async def finish(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.commentary is not None:
-            db.add_avis(self.feedbacker, self.commande, self.commentary, self.star_numb)
+            db.add_avis(self.feedbacker, self.commande,
+                        self.commentary, self.star_numb)
             if self.star_numb in (1, 2):
                 await interaction.response.send_message(
                     "🇫🇷 Commentaire enregistré avec succès. "
@@ -499,6 +503,7 @@ async def self(ctx, amount: int = None):
                                     ephemeral=True)
             await ctx.channel.purge(limit=amount)
 
+
 @tree.command(name="ticket", guild=discord.Object(id=1046437841447686226),
               description="Lance le système de ticket en affichant le message avec la réaction")
 @discord.app_commands.checks.has_permissions(administrator=True)
@@ -542,6 +547,15 @@ async def add(interaction: discord.Interaction, user: discord.Member):
                                                   embed_links=True)
         await interaction.response.send_message(
             f"🇬🇧🇺🇸 {user} has now access to this ticket.\n\n🇫🇷 {user} a désormais accès à ce ticket.")
+        channelLog = client.get_channel(1061021846146912347)
+        embed = discord.Embed(title="📥 TICKET ADD",
+                              description="Utilisateur ajouté : " +
+                              str(user) + "\n"
+                              "Par : " + str(interaction.user) + "\n"
+                              "Ticket : " +
+                              str(interaction.channel.mention),
+                              color=discord.Colour.purple())
+        await channelLog.send(embed=embed)
 
     else:
         await interaction.response.send_message(
@@ -584,10 +598,10 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
             f"🇫🇷 Points de fidélité de {user} réinitialisés avec succès ! \n\n 🇬🇧🇺🇸 {user} fidelity points reset with success !")
         embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
                               description="Action : Réinitialisation\n"
-                                            f"Victime : {user}\n"
-                                            f"Par : {interaction.user}\n"
-                                            f"Points : {db.get_client_points(user)}",
-                                color=discord.Colour.red())
+                              f"Victime : {user}\n"
+                              f"Par : {interaction.user}\n"
+                              f"Points : {db.get_client_points(user)}",
+                              color=discord.Colour.red())
         await channelLog.send(embed=embed)
 
     elif action == 'add':
@@ -595,10 +609,10 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
         await interaction.response.send_message(
             f"{points} points de fidélité ajoutés à {user} avec succès ! \n\n 🇬🇧🇺🇸 {points} fidelity points added to {user} with success !")
         embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
-                                description="Action : Ajout\n"
-                                                f"Victime : {user}\n"
-                                                f"Par : {interaction.user}\n"
-                                                f"Points : {db.get_client_points(user)}",
+                              description="Action : Ajout\n"
+                              f"Victime : {user}\n"
+                              f"Par : {interaction.user}\n"
+                              f"Points : {db.get_client_points(user)}",
                                     color=discord.Colour.green())
         await channelLog.send(embed=embed)
 
@@ -607,10 +621,10 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
         await interaction.response.send_message(
             f"✅ {points} points de fidélité retirés à {user} avec succès ! \n\n 🇬🇧🇺🇸 {points} fidelity points removed to {user} with success !")
         embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
-                                description="Action : Retrait\n"
-                                                f"Victime : {user}\n"
-                                                f"Par : {interaction.user}\n"
-                                                f"Points : {db.get_client_points(user)}",
+                              description="Action : Retrait\n"
+                              f"Victime : {user}\n"
+                              f"Par : {interaction.user}\n"
+                              f"Points : {db.get_client_points(user)}",
                                     color=discord.Colour.orange())
         await channelLog.send(embed=embed)
 
@@ -619,10 +633,10 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
         await interaction.response.send_message(
             f"🌟 Nombre de points de {user} : {points} \n\n 🇬🇧🇺🇸 {user} fidelity points : {points}")
         embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
-                                description="Action : Visualisation\n"
-                                                f"Victime : {user}\n"
-                                                f"Par : {interaction.user}\n"
-                                                f"Points : {db.get_client_points(user)}",
+                              description="Action : Visualisation\n"
+                              f"Victime : {user}\n"
+                              f"Par : {interaction.user}\n"
+                              f"Points : {db.get_client_points(user)}",
                                     color=discord.Colour.yellow())
         await channelLog.send(embed=embed)
 
@@ -649,6 +663,8 @@ async def error_handler(interaction: discord.Interaction, error):
         else: raise error
 '''
 # Message de bienvenue
+
+
 @client.event
 async def on_member_join(member):
     channel = member.guild.system_channel
@@ -679,7 +695,8 @@ async def on_message(message):
         return
 
 
-@tasks.loop(time=datetime.time(hour=23, minute=0, second=0))  # Minuit en France (UTC+1)
+# Minuit en France (UTC+1)
+@tasks.loop(time=datetime.time(hour=23, minute=0, second=0))
 async def sendDbBackup():
     fichier = "resources/database.db"
     channel = client.get_channel(1068629536700366959)
