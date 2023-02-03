@@ -265,7 +265,7 @@ class MainView(discord.ui.View):
         super().__init__(timeout=None)
 
     # bouton qui kick le client du ticket
-    @discord.ui.button(label="❌ Delete", custom_id="ticket_button_delete", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="❌ Delete", custom_id="ticket_button_delete", style=discord.ButtonStyle.blurple)
     async def delete(self, interaction: discord.Interaction, button: discord.ui.Button):
         msg = "🇫🇷 Voulez-vous vraiment suprimer ce ticket ?\n\n🇬🇧🇺🇸 Are you sure you want to delete this ticket ?"
         await interaction.response.send_message(msg, view=ConfirmView(), ephemeral=True)
@@ -277,7 +277,7 @@ class MainView(discord.ui.View):
         await interaction.response.send_message(msg, view=ConfirmClose(), ephemeral=True)
 
     # bouton qui archive le client du ticket
-    @discord.ui.button(label="🗃️ Archive", custom_id="ticket_archive", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="🗃️ Archive", custom_id="ticket_archive", style=discord.ButtonStyle.green)
     async def archive(self, interaction: discord.Interaction, button: discord.ui.Button):
         msg = "🇫🇷 Voulez-vous vraiment archiver ce ticket ?\n\n🇬🇧🇺🇸 Are you sure you want to archive this ticket ?"
         await interaction.response.send_message(msg, view=ArchiveConfirm(), ephemeral=True)
@@ -547,12 +547,12 @@ async def add(interaction: discord.Interaction, user: discord.Member):
                                                   embed_links=True)
         await interaction.response.send_message(
             f"🇬🇧🇺🇸 {user} has now access to this ticket.\n\n🇫🇷 {user} a désormais accès à ce ticket.")
-        channelLog = client.get_channel(1061021846146912347)
+        channelLog = client.get_channel(1068629560209440780)
         embed = discord.Embed(title="📥 TICKET ADD",
-                              description="Utilisateur ajouté : " +
-                              str(user) + "\n"
-                              "Par : " + str(interaction.user) + "\n"
-                              "Ticket : " +
+                              description="**Utilisateur ajouté :** " +
+                              str(user.mention) + "\n\n"
+                              "**Par :** " + str(interaction.user.mention) + "\n\n"
+                              "**Ticket :** " +
                               str(interaction.channel.mention),
                               color=discord.Colour.purple())
         await channelLog.send(embed=embed)
@@ -595,11 +595,11 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
     if action == 'reset':
         db.reset_client_points(user)
         await interaction.response.send_message(
-            f"🇫🇷 Points de fidélité de {user} réinitialisés avec succès ! \n\n 🇬🇧🇺🇸 {user} fidelity points reset with success !")
+            f"🇫🇷 Points de fidélité de {user} réinitialisés avec succès ! \n\n🇬🇧🇺🇸 {user} fidelity points reset with success !")
         embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
                               description="Action : Réinitialisation\n"
-                              f"Victime : {user}\n"
-                              f"Par : {interaction.user}\n"
+                              f"Victime : {user.mention}\n"
+                              f"Par : {interaction.user.mention}\n"
                               f"Points : {db.get_client_points(user)}",
                               color=discord.Colour.red())
         await channelLog.send(embed=embed)
@@ -607,11 +607,11 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
     elif action == 'add':
         db.add_client_points(user, points)
         await interaction.response.send_message(
-            f"{points} points de fidélité ajoutés à {user} avec succès ! \n\n 🇬🇧🇺🇸 {points} fidelity points added to {user} with success !")
+            f"🇫🇷 {points} points de fidélité ajoutés à {user} avec succès ! \n\n🇬🇧🇺🇸 {points} fidelity points added to {user} with success !")
         embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
                               description="Action : Ajout\n"
-                              f"Victime : {user}\n"
-                              f"Par : {interaction.user}\n"
+                              f"Victime : {user.mention}\n"
+                              f"Par : {interaction.user.mention}\n"
                               f"Points : {db.get_client_points(user)}",
                                     color=discord.Colour.green())
         await channelLog.send(embed=embed)
@@ -619,11 +619,11 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
     elif action == 'remove':
         db.remove_client_points(user, points)
         await interaction.response.send_message(
-            f"✅ {points} points de fidélité retirés à {user} avec succès ! \n\n 🇬🇧🇺🇸 {points} fidelity points removed to {user} with success !")
+            f"🇫🇷 {points} points de fidélité retirés à {user} avec succès ! \n\n🇬🇧🇺🇸 {points} fidelity points removed to {user} with success !")
         embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
                               description="Action : Retrait\n"
-                              f"Victime : {user}\n"
-                              f"Par : {interaction.user}\n"
+                              f"Victime : {user.mention}\n"
+                              f"Par : {interaction.user.mention}\n"
                               f"Points : {db.get_client_points(user)}",
                                     color=discord.Colour.orange())
         await channelLog.send(embed=embed)
@@ -631,11 +631,11 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
     else:
         points = db.get_client_points(user)
         await interaction.response.send_message(
-            f"🌟 Nombre de points de {user} : {points} \n\n 🇬🇧🇺🇸 {user} fidelity points : {points}")
+            f"🇫🇷 Nombre de points de {user} : {points} 🌟\n\n🇬🇧🇺🇸 {user} fidelity points : {points} 🌟")
         embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
                               description="Action : Visualisation\n"
-                              f"Victime : {user}\n"
-                              f"Par : {interaction.user}\n"
+                              f"Victime : {user.mention}\n"
+                              f"Par : {interaction.user.mention}\n"
                               f"Points : {db.get_client_points(user)}",
                                     color=discord.Colour.yellow())
         await channelLog.send(embed=embed)
