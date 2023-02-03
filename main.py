@@ -582,25 +582,49 @@ async def fidelity_points(interaction: discord.Interaction, user: discord.Member
         db.reset_client_points(user)
         await interaction.response.send_message(
             f"✅ Points de fidélité de {user} réinitialisés avec succès !")
-        await channelLog.send(f"🌟 Points de fidélité de {user} réinitialisés par {interaction.user} !")
+        embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
+                              description="Action : Réinitialisation\n"
+                                            f"Victime : {user}\n"
+                                            f"Par : {interaction.user}\n"
+                                            f"Points : {db.get_client_points(user)}",
+                                color=discord.Colour.red())
+        await channelLog.send(embed=embed)
 
     elif action == 'add':
         db.add_client_points(user, points)
         await interaction.response.send_message(
             f"✅ {points} points de fidélité ajoutés à {user} avec succès !")
-        await channelLog.send(f"🌟 {points} points ajoutés à {user} par {interaction.user} !")
+        embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
+                                description="Action : Ajout\n"
+                                                f"Victime : {user}\n"
+                                                f"Par : {interaction.user}\n"
+                                                f"Points : {db.get_client_points(user)}",
+                                    color=discord.Colour.green())
+        await channelLog.send(embed=embed)
 
     elif action == 'remove':
         db.remove_client_points(user, points)
         await interaction.response.send_message(
             f"✅ {points} points de fidélité retirés à {user} avec succès !")
-        await channelLog.send(f"🌟 {points} points retirés à {user} par {interaction.user} !")
+        embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
+                                description="Action : Retrait\n"
+                                                f"Victime : {user}\n"
+                                                f"Par : {interaction.user}\n"
+                                                f"Points : {db.get_client_points(user)}",
+                                    color=discord.Colour.orange())
+        await channelLog.send(embed=embed)
 
     else:
         points = db.get_client_points(user)
         await interaction.response.send_message(
             f"🌟 Nombre de points de {user} : {points}")
-        await channelLog.send(f"🌟 Commande de visualisation des points de fidélité effectuée pour {user} ! Il en a {points}")
+        embed = discord.Embed(title="🌟 POINTS DE FIDÉLITÉ",
+                                description="Action : Visualisation\n"
+                                                f"Victime : {user}\n"
+                                                f"Par : {interaction.user}\n"
+                                                f"Points : {db.get_client_points(user)}",
+                                    color=discord.Colour.yellow())
+        await channelLog.send(embed=embed)
 
 '''
 @tree.error
