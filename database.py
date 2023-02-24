@@ -23,7 +23,7 @@ cur.execute("""CREATE TABLE IF NOT EXISTS avis(
             id_avis INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
             id_client INTEGER NOT NULL,
             date_publication TEXT NOT NULL,
-            type_commande TEXT NOT NULL,
+            id_vendeur TEXT NOT NULL,
             commentaire TEXT NOT NULL, 
             note INTEGER NOT NULL,
             FOREIGN KEY(id_client) REFERENCES comptes(id_discord)

@@ -33,6 +33,11 @@ def get_token():
     """
     return get("TOKEN")
 
+def get_dev_mode():
+    """
+    Renvoie le mode du bot
+    """
+    return get("DEV_MODE")
 
 def get(field: str):
     """

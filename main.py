@@ -11,6 +11,7 @@ import config
 import database as db
 from discord.ext import tasks
 import datetime
+import calendar
 import os
 from pytz import timezone
 
@@ -40,12 +41,15 @@ class AClient(discord.Client):
             sendDbBackup.start()
 
         # Logs
-        embed = discord.Embed(title="🟢 Le bot est en ligne !",
-                              color=discord.Colour.dark_green())
+        if config.get_dev_mode() == "False":
+            embed = discord.Embed(title="🟢 Le bot est en ligne !",
+                                  color=discord.Colour.dark_green())
+            channelLog = client.get_channel(1068629560209440780)
+            await channelLog.send(embed=embed)
+        
+
         print(f"🤖 Connexion réussie : {self.user}.")
         self.loop.create_task(self.status_task())
-        channelLog = client.get_channel(1068629560209440780)
-        await channelLog.send(embed=embed)
 
     async def status_task(self):
         guild = self.get_guild(1046437841447686226)
@@ -139,10 +143,12 @@ class TickerLauncher(discord.ui.View):
                 category=category)
 
             await channel.send(
-                f"**Hey <@&1046437980333670510> !**\n🇫🇷{interaction.user.mention} viens de créer un ticket ! "
-                f"Merci de nous donner le plus de détails possibles sur votre demande.\n\n"
-                f"🇬🇧🇺🇸 {interaction.user.mention} created a ticket ! "
-                f"Please give as much detail as possible about your request.",
+                f"**Hey <@&1046437980333670510> !**\n🇫🇷{interaction.user.mention} viens de créer un ticket !"
+                f"\nMerci de nous donner le plus de détails possibles sur votre demande, notament si c'est dans le cadre d'une commande :\n"
+                f"- Une description précise de votre demande \n - Une deadline (date limite de réalisation de la demande) \n- Votre budget (optionnel) \n- Votre cahier des charges (optionnel) \n\- **Tous les détails que vous jugerez utiles !**\n"
+                f"\n🇬🇧🇺🇸{interaction.user.mention} just created a ticket !"
+                f"\nPlease give us as much details as possible about your request, especially if it is in the context of an order:\n"
+                f"- A precise description of your request \n - A deadline \n- Your budget (optional) \n- Your specifications (optional) \n\- **All the details that you think will be useful !**",
                 view=MainView())
             await interaction.response.send_message(
                 f"🇫🇷 J'ai ouvert un ticket pour vous ici {channel.mention}!\n\n"
@@ -153,14 +159,19 @@ class TickerLauncher(discord.ui.View):
             channelLog = client.get_channel(1068629560209440780)
 
             # Date conversion et formatage
-            date = interaction.created_at
-            date = date.astimezone(tz=timezone('Europe/Paris'))
-            date = date.strftime("%d/%m/%Y à %H:%M:%S")
+            
+            #date = interaction.created_at
+            #date = date.astimezone(tz=timezone('Europe/Paris'))
+            #date = date.strftime("%d/%m/%Y à %H:%M:%S")
+
+            date = datetime.datetime.utcnow()
+            utc_time = calendar.timegm(date.utctimetuple())
+            date = "<t:{}:f>".format(utc_time)
 
             embed = discord.Embed(title="🎫 TICKET CREE",
                                   description=f"""
-                                  **Nom du channel :** {channel.name}
-                                  \n**Crée par :** {interaction.user.mention}
+                                  **Channel :** {channel.mention} (`{channel.name}`)
+                                  \n**Crée par :** {interaction.user.mention} (`{interaction.user.id}`)
                                   \n**Date de création :** {date}""", color=discord.Colour.green())
             await channelLog.send(embed=embed)
 
@@ -191,13 +202,14 @@ class ConfirmView(discord.ui.View):
                 users = ", ".join(users)  # Conversion en string
 
                 # Date conversion et formatage
-                date = interaction.created_at
-                date = date.astimezone(tz=timezone('Europe/Paris'))
-                date = date.strftime("%d/%m/%Y à %H:%M:%S")
+                date = datetime.datetime.utcnow()
+                utc_time = calendar.timegm(date.utctimetuple())
+                date = "<t:{}:f>".format(utc_time)
 
                 embed = discord.Embed(title="🎫 TICKET SUPPRIME",
-                                      description=f"""**Nom du channel :** {interaction.channel.name}
-                                        \n**Fermé par :** {interaction.user.mention}
+                                      description=f"""
+                                      **Channel :** {interaction.channel.mention} (`{interaction.channel.name}`)
+                                        \n**Fermé par :** {interaction.user.mention} (`{interaction.user.id}`)
                                         \n **Utilisateurs ayant parlé dans le ticket :** {users}
                                         \n**Date de supression :** {date}""", color=discord.Colour.red())
                 await channelLog.send(embed=embed)
@@ -222,37 +234,42 @@ class ConfirmClose(discord.ui.View):
     @discord.ui.button(label="Confirm", style=discord.ButtonStyle.red, custom_id="confirm")
     async def confirm_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
-            # Log fermeture ticket
-            channelLog = client.get_channel(1068629560209440780)
-            # Fetch des users ayant parlé dans le channel
-            users = [message.author.mention async for message in interaction.channel.history(limit=200)]
-            users = list(set(users))  # Suppression des doublons
-            users = ", ".join(users)  # Conversion en string
-
-            # Date conversion et formatage
-            date = interaction.created_at
-            date = date.astimezone(tz=timezone('Europe/Paris'))
-            date = date.strftime("%d/%m/%Y à %H:%M:%S")
-
-            embed = discord.Embed(title="🎫 TICKET FERME",
-                                  description=f"""**Nom du channel :** {interaction.channel.name}
-                                    \n**Fermé par :** {interaction.user.mention}
-                                    \n **Utilisateurs ayant parlé dans le ticket :** {users}
-                                    \n**Date de finition :** {date}""", color=discord.Colour.red())
-            await channelLog.send(embed=embed)
-
-            # kick du joueur channel
-            user = interaction.user
             if "ticket-" in interaction.channel.name:
+                # Log fermeture ticket
+                channelLog = client.get_channel(1068629560209440780)
+                # Fetch des users ayant parlé dans le channel
+                users = [message.author.mention async for message in interaction.channel.history(limit=200)]
+                users = list(set(users))  # Suppression des doublons
+                users = ", ".join(users)  # Conversion en string
+
+                # Date conversion et formatage
+                date = datetime.datetime.utcnow()
+                utc_time = calendar.timegm(date.utctimetuple())
+                date = "<t:{}:f>".format(utc_time)
+
+                embed = discord.Embed(title="🎫 TICKET FERME",
+                                      description=f"""
+                                      **Channel :** {interaction.channel.mention} (`{interaction.channel.name}`)
+                                        \n**Fermé par :** {interaction.user.mention} (`{interaction.user.id}`)
+                                        \n **Utilisateurs ayant parlé dans le ticket :** {users}
+                                        \n**Date de fermeture :** {date}""", color=discord.Colour.yellow())
+                await channelLog.send(embed=embed)
+
+                # kick du joueur channel
+                user = interaction.user
                 await interaction.channel.set_permissions(user, view_channel=False)
 
+                # envoi message de fermeture
+                await interaction.channel.send(
+                    f"🇫🇷 Ce ticket a été fermé par {interaction.user.mention}."
+                )
             else:
                 await interaction.response.send_message(
                     "🇬🇧🇺🇸 This channel isn't a ticket !\n\n🇫🇷 Ce channel n'est pas un ticket !", ephemeral=True)
 
         except:
             await interaction.response.send_message(
-                "🇫🇷 Impossible de kick le joueur.",
+                "🇫🇷 Impossible de supprimer le channel.",
                 ephemeral=True)
 
 
@@ -325,16 +342,21 @@ class ArchiveConfirm(discord.ui.View):
                 users = ", ".join(users)  # Conversion en string
 
                 # Date conversion et formatage
-                date = interaction.created_at
-                date = date.astimezone(tz=timezone('Europe/Paris'))
-                date = date.strftime("%d/%m/%Y à %H:%M:%S")
+                date = datetime.datetime.utcnow()
+                utc_time = calendar.timegm(date.utctimetuple())
+                date = "<t:{}:f>".format(utc_time)
 
                 embed = discord.Embed(title="🎫 TICKET ARCHIVE",
-                                      description=f"""**Channel :** {interaction.channel.mention}
-                                        \n**Fermé par :** {interaction.user.mention}
+                                      description=f"""
+                                      **Channel :** {interaction.channel.mention} (`{interaction.channel.name}`)
+                                        \n**Fermé par :** {interaction.user.mention} (`{interaction.user.id}`)
                                         \n **Utilisateurs ayant parlé dans le ticket :** {users}
                                         \n**Date de fermeture :** {date}""", color=discord.Colour.blurple())
                 await channelLog.send(embed=embed)
+
+                await interaction.channel.send(
+                    f"🇫🇷 Ce ticket a été archivé par {interaction.user.mention}."
+                )
 
             except:
                 await interaction.response.send_message(
@@ -369,9 +391,9 @@ class FeedBack(discord.ui.View):
     Objet contenant 6 boutons avec les évenements de feedback
     """
 
-    def __init__(self, feedbacker: discord.Member, commande: str):
+    def __init__(self, feedbacker: discord.Member, freelancer: discord.Member):
         super().__init__(timeout=None)
-        self.commande = commande
+        self.freelancer = freelancer
         self.commentary = None
         self.star_numb = 5
         self.feedbacker = feedbacker
@@ -410,7 +432,7 @@ class FeedBack(discord.ui.View):
     @discord.ui.button(label="✅", custom_id="comment_fini", style=discord.ButtonStyle.green)
     async def finish(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.commentary is not None:
-            db.add_avis(self.feedbacker, self.commande,
+            db.add_avis(self.feedbacker, self.freelancer.id,
                         self.commentary, self.star_numb)
             if self.star_numb in (1, 2):
                 await interaction.response.send_message(
@@ -433,10 +455,10 @@ class FeedBack(discord.ui.View):
             channelLog = client.get_channel(1061023547402768505)
             embed = discord.Embed(title="📝 FEEDBACK",
                                   description=f"""
+            **Seller :** {self.freelancer}
             **Client :** {interaction.user.mention}
-            **Type de commande :** {self.commande}
-            **Note :** {self.star_numb}/5
-            **Commentaire :** {self.commentary}
+            **Rating :** {self.star_numb}/5
+            **Comment :** {self.commentary}
             """, color=discord.Color.purple())
             embed.set_thumbnail(url=interaction.user.avatar)
             message = await channelLog.send(embed=embed)
@@ -458,26 +480,28 @@ async def ping(interaction: discord.Interaction):
     """
     await interaction.response.send_message(f"🏓 Pong ! {round(client.latency, 3)} ms!")
 
-'''
+"""
 @tree.command(name="test", description="Test dev", guild=discord.Object(id=1046437841447686226))
 @commands.has_permissions(administrator=True)
 async def test(interaction: discord.Interaction):
-    """
-    Test dev
-    """
+    channel = interaction.channel
     member = interaction.user
+    
     embed = discord.Embed(title="👋 WELCOME !",
                           description=f"🇫🇷 Bienvenue <@{member.id}> ! "
-                                      f"Nous espérons que tu trouvera ton bonheur dans nos services.\n"
-                                      f"Pour tout comprendre sur notr système de commande, "
+                                      f"Nous espérons que vous serez satisfait par nos services.\n"
+                                      f"Pour tout comprendre sur notre système de commande, "
                                       f"rendez-vous ici : <#1061021846146912347>. \n\n"
-                                      f"🇬🇧🇺🇸 Welcome <@{member.id}> ! "
-                                      f"We hope you will find your happiness in our services.\n"
+                                      f"🇬🇧🇺🇸 Welcome <@{member.id}> ! We hope you will be satisfied by our services.\n"
                                       f"To understand our order system, go here : <#1061021846146912347>.",
                           color=discord.Colour.blue())
     embed.set_thumbnail(url=f"{member.display_avatar}")
-    await interaction.response.send_message(embed=embed)
-'''
+
+    message = await channel.send(embed=embed)
+    await message.add_reaction("👋")
+"""
+    
+
 
 
 @tree.command(name="clear", description="Retirer des messages d'un channel",
@@ -546,15 +570,21 @@ async def add(interaction: discord.Interaction, user: discord.Member):
         await interaction.channel.set_permissions(user, view_channel=True, send_messages=True, attach_files=True,
                                                   embed_links=True)
         await interaction.response.send_message(
-            f"🇬🇧🇺🇸 {user} has now access to this ticket.\n\n🇫🇷 {user} a désormais accès à ce ticket.")
+            f"🇫🇷 {user} a désormais accès à ce ticket.\n\n🇬🇧🇺🇸 {user} has now access to this ticket.")
         channelLog = client.get_channel(1068629560209440780)
-        embed = discord.Embed(title="📥 TICKET ADD",
-                              description="**Utilisateur ajouté :** " +
-                              str(user.mention) + "\n\n"
-                              "**Par :** " + str(interaction.user.mention) + "\n\n"
-                              "**Ticket :** " +
-                              str(interaction.channel.mention),
-                              color=discord.Colour.purple())
+        
+        date = datetime.datetime.utcnow()
+        utc_time = calendar.timegm(date.utctimetuple())
+        date = "<t:{}:f>".format(utc_time)
+
+        channelLog = client.get_channel(1068629560209440780)
+        embed = discord.Embed(title=" 📥 TICKET ADD",
+                            description=f"""
+                            **Ticket : ** {interaction.channel.mention} `({interaction.channel.name})`
+                            \n**Utilisateur ajouté :** {user.mention} `({user.id})`
+                            \n**Par :** {interaction.user.mention} `({interaction.user.id})`
+                            \n** Date de l'ajout :** {date}""",
+                            color=discord.Colour.purple())
         await channelLog.send(embed=embed)
 
     else:
@@ -564,8 +594,8 @@ async def add(interaction: discord.Interaction, user: discord.Member):
 
 @tree.command(name="feedback", guild=discord.Object(id=1046437841447686226), description="Lance le système de feedback")
 @discord.app_commands.checks.has_permissions(manage_channels=True)
-@discord.app_commands.describe(commande="Commandes passée")
-async def launch_feedback(interaction: discord.Interaction, commande: str):
+@discord.app_commands.describe(freelancer="Le freelancer à qui donner le feedback")
+async def launch_feedback(interaction: discord.Interaction, freelancer: discord.Member):
     embed = discord.Embed(title="🌟 FEEDBACK",
                           description="🇫🇷 Afin d'avoir un retour clair sur notre service, "
                                       "nous vous invitons à ajouter un commentaire et une note à E-shop "
@@ -576,9 +606,51 @@ async def launch_feedback(interaction: discord.Interaction, commande: str):
                                       "This will only take a few minutes.",
                           color=discord.Colour.blue())
     await interaction.channel.send(embed=embed,
-                                   view=FeedBack(feedbacker=interaction.user, commande=commande))
+                                   view=FeedBack(feedbacker=interaction.user, freelancer=freelancer))
     await interaction.response.send_message("✅ Système de feedback lancé avec succès !", ephemeral=True)
 
+@tree.command(name="ticketremove", guild=discord.Object(id=1046437841447686226),
+                description="Retire un utilisateur du ticket")
+@discord.app_commands.describe(user="L'utilisateur à retirer du ticket")
+@discord.app_commands.checks.has_permissions(manage_channels=True)
+async def remove(interaction: discord.Interaction, user: discord.Member):
+    """
+    Retire un utilisateur du ticket
+    """
+    if "ticket-" in interaction.channel.name:
+            date = datetime.datetime.utcnow()
+            utc_time = calendar.timegm(date.utctimetuple())
+            date = "<t:{}:f>".format(utc_time)
+
+            await interaction.channel.set_permissions(user, view_channel=False, send_messages=False, attach_files=False,
+                                                  embed_links=False)
+            await interaction.response.send_message(
+                f"🇫🇷 {user} n'a désormais plus accès à ce ticket.\n\n🇬🇧🇺🇸 {user} has no more access to this ticket.")
+            channelLog = client.get_channel(1068629560209440780)
+            embed = discord.Embed(title="📤 TICKET REMOVE",
+                            description=f"""
+                            **Ticket : ** {interaction.channel.mention} `({interaction.channel.name})`
+                            \n**Utilisateur retiré :** {user.mention} `({user.id})`
+                            \n**Par :** {interaction.user.mention} `({interaction.user.id})`
+                            \n** Date du retrait :** {date}""",
+                            color=discord.Colour.purple())
+            await channelLog.send(embed=embed)
+
+@tree.command(name="proposition", guild=discord.Object(id=1046437841447686226), description="Lance le système d'estimation")
+@discord.app_commands.describe(client="Le client à qui faire l'estimation", product = "Récapiltlatif de la commande", price="Le prix de la commande")
+@discord.app_commands.checks.has_permissions(manage_channels=True)
+async def launch_estimate(interaction: discord.Interaction, client: discord.Member, product: str, price: int):
+    embed = discord.Embed(title="📈 OFFRE POUR LA COMMANDE",
+                          description=f"""
+                          **Vendeur :** {interaction.user.mention}
+                          **Client :** {client.mention}
+                          **Récapitulatif de la commande :** {product}
+                          **Prix proposé par le vendeur :** {price}€              
+                          """,
+                          color=discord.Colour.blue())
+    embed.set_footer(text="Attention, ce message est affiché à titre indicatif car le prix de la commande ne dépasse 25€ peut pas être considérée comme un devis ou une facture.\nEn confirmant la commande, vous acceptez les conditions générales de vente de E-shop.")
+    await interaction.channel.send(embed=embed)
+    await interaction.response.send_message("✅ Système d'estimation lancé avec succès !", ephemeral=True)
 
 @tree.command(name="points", guild=discord.Object(id=1046437841447686226), description="Permet de modifier ou visualiser les points de fidélité d'un client")
 @discord.app_commands.choices(action=[
@@ -671,13 +743,15 @@ async def on_member_join(member):
     embed = discord.Embed(title="👋 WELCOME !",
                           description=f"🇫🇷 Bienvenue <@{member.id}> ! "
                                       f"Nous espérons que vous serez satisfait par nos services.\n"
-                                      f"Pour tout comprendre sur notr système de commande, "
+                                      f"Pour tout comprendre sur notre système de commande, "
                                       f"rendez-vous ici : <#1061021846146912347>. \n\n"
                                       f"🇬🇧🇺🇸 Welcome <@{member.id}> ! We hope you will be satisfied by our services.\n"
                                       f"To understand our order system, go here : <#1061021846146912347>.",
                           color=discord.Colour.blue())
     embed.set_thumbnail(url=f"{member.display_avatar}")
-    await channel.send(embed=embed)
+
+    message = await channel.send(embed=embed)
+    await message.add_reaction("👋")
 
 
 # Commentaires pour le feedback
